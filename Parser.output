@@ -1,0 +1,2787 @@
+   0  $accept : %entry% $end
+
+   1  start : includes program EOF
+
+   2  includes :
+   3           | includes includ
+
+   4  includ : INCLUDE STRING
+
+   5  program : declaration
+   6          | program declaration
+
+   7  declaration : var_declaration
+   8              | func_declaration
+   9              | func_definition
+
+  10  var_declaration : typea declarators SEMICOLON
+
+  11  declarators : declarator
+  12              | declarators COMMA declarator
+
+  13  typea : b_typea
+  14        | typea TIMES
+
+  15  b_typea : INT
+  16          | DOUBLE
+  17          | BOOL
+  18          | CHAR
+
+  19  declarator : IDENT
+  20             | IDENT LBRACK constant_exp RBRACK
+
+  21  func_declaration : typea IDENT LPAREN op_parameter_list RPAREN SEMICOLON
+  22                   | VOID IDENT LPAREN op_parameter_list RPAREN SEMICOLON
+
+  23  op_parameter_list :
+  24                    | parameter_list
+
+  25  parameter_list : parameter parameters
+
+  26  parameters :
+  27             | COMMA parameter parameters
+
+  28  parameter : BYREF typea IDENT
+  29            | typea IDENT
+
+  30  func_definition : typea IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK
+  31                  | VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK
+
+  32  declarations :
+  33               | declarations declaration
+
+  34  statements :
+  35             | statements statement
+
+  36  op_exp :
+  37         | expression
+
+  38  op_ident_colon :
+  39                 | IDENT COLON
+
+  40  op_ident :
+  41           | IDENT
+
+  42  statement : SEMICOLON
+  43            | expression SEMICOLON
+  44            | LCBRACK statements RCBRACK
+  45            | IF LPAREN expression RPAREN statement
+  46            | IF LPAREN expression RPAREN statement ELSE statement
+  47            | op_ident_colon FOR LPAREN op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement
+  48            | CONTINUE op_ident SEMICOLON
+  49            | BREAK op_ident SEMICOLON
+  50            | RETURN op_exp SEMICOLON
+
+  51  expression : IDENT
+  52             | LPAREN expression RPAREN
+  53             | TRUE
+  54             | FALSE
+  55             | NULL
+  56             | INT_NUM
+  57             | CHAR_V
+  58             | DOUBLE_NUM
+  59             | STRING
+  60             | IDENT LPAREN op_exp_list RPAREN
+  61             | unary_op expression
+  62             | unary_assignment expression
+  63             | LPAREN typea RPAREN expression
+  64             | NEW typea op_brack_exp
+  65             | DELETE expression
+  66             | expression LBRACK expression RBRACK
+  67             | expression binary_op expression
+  68             | expression unary_assignment
+  69             | expression binary_assignment expression
+  70             | expression Q_MARK expression COLON expression
+
+  71  op_exp_list :
+  72              | expression_list
+
+  73  op_brack_exp :
+  74               | LBRACK expression RBRACK
+
+  75  expression_list : expression
+  76                  | expression_list COMMA expression
+
+  77  constant_exp : expression
+
+  78  unary_op : AMPERSAND
+  79           | TIMES
+  80           | PLUS
+  81           | MINUS
+  82           | NOT
+
+  83  binary_op : TIMES
+  84            | DIV
+  85            | MOD
+  86            | PLUS
+  87            | MINUS
+  88            | LESS
+  89            | GREATER
+  90            | LESS_EQ
+  91            | GREAT_EQ
+  92            | EQUAL
+  93            | N_EQUAL
+  94            | AND
+  95            | OR
+  96            | COMMA
+
+  97  unary_assignment : PPLUS
+  98                   | MMINUS
+
+  99  binary_assignment : ASSIGN
+ 100                    | ASSIGN_TIMES
+ 101                    | ASSIGN_DIV
+ 102                    | ASSIGN_MOD
+ 103                    | ASSIGN_ADD
+ 104                    | ASSIGN_MINUS
+
+ 105  %entry% : '\001' start
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . start  (105)
+	includes : .  (2)
+
+	.  reduce 2
+
+	start  goto 3
+	includes  goto 4
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	%entry% : '\001' start .  (105)
+
+	.  reduce 105
+
+
+state 4
+	start : includes . program EOF  (1)
+	includes : includes . includ  (3)
+
+	BOOL  shift 5
+	DOUBLE  shift 6
+	INT  shift 7
+	VOID  shift 8
+	CHAR  shift 9
+	INCLUDE  shift 10
+	.  error
+
+	includ  goto 11
+	program  goto 12
+	declaration  goto 13
+	var_declaration  goto 14
+	func_declaration  goto 15
+	func_definition  goto 16
+	typea  goto 17
+	b_typea  goto 18
+
+
+state 5
+	b_typea : BOOL .  (17)
+
+	.  reduce 17
+
+
+state 6
+	b_typea : DOUBLE .  (16)
+
+	.  reduce 16
+
+
+state 7
+	b_typea : INT .  (15)
+
+	.  reduce 15
+
+
+state 8
+	func_declaration : VOID . IDENT LPAREN op_parameter_list RPAREN SEMICOLON  (22)
+	func_definition : VOID . IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK  (31)
+
+	IDENT  shift 19
+	.  error
+
+
+state 9
+	b_typea : CHAR .  (18)
+
+	.  reduce 18
+
+
+state 10
+	includ : INCLUDE . STRING  (4)
+
+	STRING  shift 20
+	.  error
+
+
+state 11
+	includes : includes includ .  (3)
+
+	.  reduce 3
+
+
+state 12
+	start : includes program . EOF  (1)
+	program : program . declaration  (6)
+
+	BOOL  shift 5
+	DOUBLE  shift 6
+	INT  shift 7
+	VOID  shift 8
+	CHAR  shift 9
+	EOF  shift 21
+	.  error
+
+	declaration  goto 22
+	var_declaration  goto 14
+	func_declaration  goto 15
+	func_definition  goto 16
+	typea  goto 17
+	b_typea  goto 18
+
+
+state 13
+	program : declaration .  (5)
+
+	.  reduce 5
+
+
+state 14
+	declaration : var_declaration .  (7)
+
+	.  reduce 7
+
+
+state 15
+	declaration : func_declaration .  (8)
+
+	.  reduce 8
+
+
+state 16
+	declaration : func_definition .  (9)
+
+	.  reduce 9
+
+
+state 17
+	var_declaration : typea . declarators SEMICOLON  (10)
+	typea : typea . TIMES  (14)
+	func_declaration : typea . IDENT LPAREN op_parameter_list RPAREN SEMICOLON  (21)
+	func_definition : typea . IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK  (30)
+
+	IDENT  shift 23
+	TIMES  shift 24
+	.  error
+
+	declarators  goto 25
+	declarator  goto 26
+
+
+state 18
+	typea : b_typea .  (13)
+
+	.  reduce 13
+
+
+state 19
+	func_declaration : VOID IDENT . LPAREN op_parameter_list RPAREN SEMICOLON  (22)
+	func_definition : VOID IDENT . LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK  (31)
+
+	LPAREN  shift 27
+	.  error
+
+
+state 20
+	includ : INCLUDE STRING .  (4)
+
+	.  reduce 4
+
+
+state 21
+	start : includes program EOF .  (1)
+
+	.  reduce 1
+
+
+state 22
+	program : program declaration .  (6)
+
+	.  reduce 6
+
+
+state 23
+	declarator : IDENT .  (19)
+	declarator : IDENT . LBRACK constant_exp RBRACK  (20)
+	func_declaration : typea IDENT . LPAREN op_parameter_list RPAREN SEMICOLON  (21)
+	func_definition : typea IDENT . LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK  (30)
+
+	LPAREN  shift 28
+	LBRACK  shift 29
+	COMMA  reduce 19
+	SEMICOLON  reduce 19
+
+
+state 24
+	typea : typea TIMES .  (14)
+
+	.  reduce 14
+
+
+state 25
+	var_declaration : typea declarators . SEMICOLON  (10)
+	declarators : declarators . COMMA declarator  (12)
+
+	COMMA  shift 30
+	SEMICOLON  shift 31
+	.  error
+
+
+state 26
+	declarators : declarator .  (11)
+
+	.  reduce 11
+
+
+state 27
+	func_declaration : VOID IDENT LPAREN . op_parameter_list RPAREN SEMICOLON  (22)
+	func_definition : VOID IDENT LPAREN . op_parameter_list RPAREN LCBRACK declarations statements RCBRACK  (31)
+	op_parameter_list : .  (23)
+
+	BOOL  shift 5
+	BYREF  shift 32
+	DOUBLE  shift 6
+	INT  shift 7
+	CHAR  shift 9
+	RPAREN  reduce 23
+
+	typea  goto 33
+	b_typea  goto 18
+	op_parameter_list  goto 34
+	parameter_list  goto 35
+	parameter  goto 36
+
+
+state 28
+	func_declaration : typea IDENT LPAREN . op_parameter_list RPAREN SEMICOLON  (21)
+	func_definition : typea IDENT LPAREN . op_parameter_list RPAREN LCBRACK declarations statements RCBRACK  (30)
+	op_parameter_list : .  (23)
+
+	BOOL  shift 5
+	BYREF  shift 32
+	DOUBLE  shift 6
+	INT  shift 7
+	CHAR  shift 9
+	RPAREN  reduce 23
+
+	typea  goto 33
+	b_typea  goto 18
+	op_parameter_list  goto 37
+	parameter_list  goto 35
+	parameter  goto 36
+
+
+state 29
+	declarator : IDENT LBRACK . constant_exp RBRACK  (20)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 56
+	constant_exp  goto 57
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 30
+	declarators : declarators COMMA . declarator  (12)
+
+	IDENT  shift 60
+	.  error
+
+	declarator  goto 61
+
+
+state 31
+	var_declaration : typea declarators SEMICOLON .  (10)
+
+	.  reduce 10
+
+
+state 32
+	parameter : BYREF . typea IDENT  (28)
+
+	BOOL  shift 5
+	DOUBLE  shift 6
+	INT  shift 7
+	CHAR  shift 9
+	.  error
+
+	typea  goto 62
+	b_typea  goto 18
+
+
+state 33
+	typea : typea . TIMES  (14)
+	parameter : typea . IDENT  (29)
+
+	IDENT  shift 63
+	TIMES  shift 24
+	.  error
+
+
+state 34
+	func_declaration : VOID IDENT LPAREN op_parameter_list . RPAREN SEMICOLON  (22)
+	func_definition : VOID IDENT LPAREN op_parameter_list . RPAREN LCBRACK declarations statements RCBRACK  (31)
+
+	RPAREN  shift 64
+	.  error
+
+
+state 35
+	op_parameter_list : parameter_list .  (24)
+
+	.  reduce 24
+
+
+state 36
+	parameter_list : parameter . parameters  (25)
+	parameters : .  (26)
+
+	COMMA  shift 65
+	RPAREN  reduce 26
+
+	parameters  goto 66
+
+
+state 37
+	func_declaration : typea IDENT LPAREN op_parameter_list . RPAREN SEMICOLON  (21)
+	func_definition : typea IDENT LPAREN op_parameter_list . RPAREN LCBRACK declarations statements RCBRACK  (30)
+
+	RPAREN  shift 67
+	.  error
+
+
+state 38
+	expression : DELETE . expression  (65)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 68
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 39
+	expression : FALSE .  (54)
+
+	.  reduce 54
+
+
+state 40
+	expression : NEW . typea op_brack_exp  (64)
+
+	BOOL  shift 5
+	DOUBLE  shift 6
+	INT  shift 7
+	CHAR  shift 9
+	.  error
+
+	typea  goto 69
+	b_typea  goto 18
+
+
+state 41
+	expression : INT_NUM .  (56)
+
+	.  reduce 56
+
+
+state 42
+	expression : DOUBLE_NUM .  (58)
+
+	.  reduce 58
+
+
+state 43
+	expression : NULL .  (55)
+
+	.  reduce 55
+
+
+state 44
+	expression : TRUE .  (53)
+
+	.  reduce 53
+
+
+state 45
+	expression : IDENT .  (51)
+	expression : IDENT . LPAREN op_exp_list RPAREN  (60)
+
+	LPAREN  shift 70
+	ASSIGN  reduce 51
+	PLUS  reduce 51
+	MINUS  reduce 51
+	TIMES  reduce 51
+	DIV  reduce 51
+	GREATER  reduce 51
+	LESS  reduce 51
+	MOD  reduce 51
+	Q_MARK  reduce 51
+	COLON  reduce 51
+	COMMA  reduce 51
+	EQUAL  reduce 51
+	N_EQUAL  reduce 51
+	GREAT_EQ  reduce 51
+	LESS_EQ  reduce 51
+	AND  reduce 51
+	OR  reduce 51
+	PPLUS  reduce 51
+	MMINUS  reduce 51
+	ASSIGN_ADD  reduce 51
+	ASSIGN_MINUS  reduce 51
+	ASSIGN_TIMES  reduce 51
+	ASSIGN_DIV  reduce 51
+	ASSIGN_MOD  reduce 51
+	SEMICOLON  reduce 51
+	RPAREN  reduce 51
+	LBRACK  reduce 51
+	RBRACK  reduce 51
+
+
+state 46
+	expression : CHAR_V .  (57)
+
+	.  reduce 57
+
+
+state 47
+	expression : STRING .  (59)
+
+	.  reduce 59
+
+
+state 48
+	unary_op : PLUS .  (80)
+
+	.  reduce 80
+
+
+state 49
+	unary_op : MINUS .  (81)
+
+	.  reduce 81
+
+
+state 50
+	unary_op : TIMES .  (79)
+
+	.  reduce 79
+
+
+state 51
+	unary_op : AMPERSAND .  (78)
+
+	.  reduce 78
+
+
+state 52
+	unary_op : NOT .  (82)
+
+	.  reduce 82
+
+
+state 53
+	unary_assignment : PPLUS .  (97)
+
+	.  reduce 97
+
+
+state 54
+	unary_assignment : MMINUS .  (98)
+
+	.  reduce 98
+
+
+state 55
+	expression : LPAREN . expression RPAREN  (52)
+	expression : LPAREN . typea RPAREN expression  (63)
+
+	BOOL  shift 5
+	DELETE  shift 38
+	DOUBLE  shift 6
+	FALSE  shift 39
+	INT  shift 7
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	CHAR  shift 9
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	typea  goto 71
+	b_typea  goto 18
+	expression  goto 72
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 56
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+	constant_exp : expression .  (77)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	RBRACK  reduce 77
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 57
+	declarator : IDENT LBRACK constant_exp . RBRACK  (20)
+
+	RBRACK  shift 98
+	.  error
+
+
+state 58
+	expression : unary_op . expression  (61)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 99
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 59
+	expression : unary_assignment . expression  (62)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 100
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 60
+	declarator : IDENT .  (19)
+	declarator : IDENT . LBRACK constant_exp RBRACK  (20)
+
+	LBRACK  shift 29
+	COMMA  reduce 19
+	SEMICOLON  reduce 19
+
+
+state 61
+	declarators : declarators COMMA declarator .  (12)
+
+	.  reduce 12
+
+
+state 62
+	typea : typea . TIMES  (14)
+	parameter : BYREF typea . IDENT  (28)
+
+	IDENT  shift 101
+	TIMES  shift 24
+	.  error
+
+
+state 63
+	parameter : typea IDENT .  (29)
+
+	.  reduce 29
+
+
+state 64
+	func_declaration : VOID IDENT LPAREN op_parameter_list RPAREN . SEMICOLON  (22)
+	func_definition : VOID IDENT LPAREN op_parameter_list RPAREN . LCBRACK declarations statements RCBRACK  (31)
+
+	SEMICOLON  shift 102
+	LCBRACK  shift 103
+	.  error
+
+
+state 65
+	parameters : COMMA . parameter parameters  (27)
+
+	BOOL  shift 5
+	BYREF  shift 32
+	DOUBLE  shift 6
+	INT  shift 7
+	CHAR  shift 9
+	.  error
+
+	typea  goto 33
+	b_typea  goto 18
+	parameter  goto 104
+
+
+state 66
+	parameter_list : parameter parameters .  (25)
+
+	.  reduce 25
+
+
+state 67
+	func_declaration : typea IDENT LPAREN op_parameter_list RPAREN . SEMICOLON  (21)
+	func_definition : typea IDENT LPAREN op_parameter_list RPAREN . LCBRACK declarations statements RCBRACK  (30)
+
+	SEMICOLON  shift 105
+	LCBRACK  shift 106
+	.  error
+
+
+68: shift/reduce conflict (shift 90, reduce 65) on ASSIGN_MINUS
+68: shift/reduce conflict (shift 94, reduce 65) on LBRACK
+state 68
+	expression : DELETE expression .  (65)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 65
+	PLUS  reduce 65
+	MINUS  reduce 65
+	TIMES  reduce 65
+	DIV  reduce 65
+	GREATER  reduce 65
+	LESS  reduce 65
+	MOD  reduce 65
+	Q_MARK  reduce 65
+	COLON  reduce 65
+	COMMA  reduce 65
+	EQUAL  reduce 65
+	N_EQUAL  reduce 65
+	GREAT_EQ  reduce 65
+	LESS_EQ  reduce 65
+	AND  reduce 65
+	OR  reduce 65
+	PPLUS  reduce 65
+	MMINUS  reduce 65
+	ASSIGN_ADD  reduce 65
+	ASSIGN_TIMES  reduce 65
+	ASSIGN_DIV  reduce 65
+	ASSIGN_MOD  reduce 65
+	SEMICOLON  reduce 65
+	RPAREN  reduce 65
+	RBRACK  reduce 65
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+69: shift/reduce conflict (shift 24, reduce 73) on TIMES
+69: shift/reduce conflict (shift 107, reduce 73) on LBRACK
+state 69
+	typea : typea . TIMES  (14)
+	expression : NEW typea . op_brack_exp  (64)
+	op_brack_exp : .  (73)
+
+	TIMES  shift 24
+	LBRACK  shift 107
+	ASSIGN  reduce 73
+	PLUS  reduce 73
+	MINUS  reduce 73
+	DIV  reduce 73
+	GREATER  reduce 73
+	LESS  reduce 73
+	MOD  reduce 73
+	Q_MARK  reduce 73
+	COLON  reduce 73
+	COMMA  reduce 73
+	EQUAL  reduce 73
+	N_EQUAL  reduce 73
+	GREAT_EQ  reduce 73
+	LESS_EQ  reduce 73
+	AND  reduce 73
+	OR  reduce 73
+	PPLUS  reduce 73
+	MMINUS  reduce 73
+	ASSIGN_ADD  reduce 73
+	ASSIGN_MINUS  reduce 73
+	ASSIGN_TIMES  reduce 73
+	ASSIGN_DIV  reduce 73
+	ASSIGN_MOD  reduce 73
+	SEMICOLON  reduce 73
+	RPAREN  reduce 73
+	RBRACK  reduce 73
+
+	op_brack_exp  goto 108
+
+
+state 70
+	expression : IDENT LPAREN . op_exp_list RPAREN  (60)
+	op_exp_list : .  (71)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	RPAREN  reduce 71
+
+	expression  goto 109
+	expression_list  goto 110
+	op_exp_list  goto 111
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 71
+	typea : typea . TIMES  (14)
+	expression : LPAREN typea . RPAREN expression  (63)
+
+	TIMES  shift 24
+	RPAREN  shift 112
+	.  error
+
+
+state 72
+	expression : LPAREN expression . RPAREN  (52)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	RPAREN  shift 113
+	LBRACK  shift 94
+	.  error
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 73
+	binary_assignment : ASSIGN .  (99)
+
+	.  reduce 99
+
+
+state 74
+	binary_op : PLUS .  (86)
+
+	.  reduce 86
+
+
+state 75
+	binary_op : MINUS .  (87)
+
+	.  reduce 87
+
+
+state 76
+	binary_op : TIMES .  (83)
+
+	.  reduce 83
+
+
+state 77
+	binary_op : DIV .  (84)
+
+	.  reduce 84
+
+
+state 78
+	binary_op : GREATER .  (89)
+
+	.  reduce 89
+
+
+state 79
+	binary_op : LESS .  (88)
+
+	.  reduce 88
+
+
+state 80
+	binary_op : MOD .  (85)
+
+	.  reduce 85
+
+
+state 81
+	expression : expression Q_MARK . expression COLON expression  (70)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 114
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 82
+	binary_op : COMMA .  (96)
+
+	.  reduce 96
+
+
+state 83
+	binary_op : EQUAL .  (92)
+
+	.  reduce 92
+
+
+state 84
+	binary_op : N_EQUAL .  (93)
+
+	.  reduce 93
+
+
+state 85
+	binary_op : GREAT_EQ .  (91)
+
+	.  reduce 91
+
+
+state 86
+	binary_op : LESS_EQ .  (90)
+
+	.  reduce 90
+
+
+state 87
+	binary_op : AND .  (94)
+
+	.  reduce 94
+
+
+state 88
+	binary_op : OR .  (95)
+
+	.  reduce 95
+
+
+state 89
+	binary_assignment : ASSIGN_ADD .  (103)
+
+	.  reduce 103
+
+
+state 90
+	binary_assignment : ASSIGN_MINUS .  (104)
+
+	.  reduce 104
+
+
+state 91
+	binary_assignment : ASSIGN_TIMES .  (100)
+
+	.  reduce 100
+
+
+state 92
+	binary_assignment : ASSIGN_DIV .  (101)
+
+	.  reduce 101
+
+
+state 93
+	binary_assignment : ASSIGN_MOD .  (102)
+
+	.  reduce 102
+
+
+state 94
+	expression : expression LBRACK . expression RBRACK  (66)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 115
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 95
+	expression : expression unary_assignment .  (68)
+
+	.  reduce 68
+
+
+state 96
+	expression : expression binary_op . expression  (67)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 116
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 97
+	expression : expression binary_assignment . expression  (69)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 117
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 98
+	declarator : IDENT LBRACK constant_exp RBRACK .  (20)
+
+	.  reduce 20
+
+
+99: shift/reduce conflict (shift 90, reduce 61) on ASSIGN_MINUS
+99: shift/reduce conflict (shift 94, reduce 61) on LBRACK
+state 99
+	expression : unary_op expression .  (61)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 61
+	PLUS  reduce 61
+	MINUS  reduce 61
+	TIMES  reduce 61
+	DIV  reduce 61
+	GREATER  reduce 61
+	LESS  reduce 61
+	MOD  reduce 61
+	Q_MARK  reduce 61
+	COLON  reduce 61
+	COMMA  reduce 61
+	EQUAL  reduce 61
+	N_EQUAL  reduce 61
+	GREAT_EQ  reduce 61
+	LESS_EQ  reduce 61
+	AND  reduce 61
+	OR  reduce 61
+	PPLUS  reduce 61
+	MMINUS  reduce 61
+	ASSIGN_ADD  reduce 61
+	ASSIGN_TIMES  reduce 61
+	ASSIGN_DIV  reduce 61
+	ASSIGN_MOD  reduce 61
+	SEMICOLON  reduce 61
+	RPAREN  reduce 61
+	RBRACK  reduce 61
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+100: shift/reduce conflict (shift 90, reduce 62) on ASSIGN_MINUS
+100: shift/reduce conflict (shift 94, reduce 62) on LBRACK
+state 100
+	expression : unary_assignment expression .  (62)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 62
+	PLUS  reduce 62
+	MINUS  reduce 62
+	TIMES  reduce 62
+	DIV  reduce 62
+	GREATER  reduce 62
+	LESS  reduce 62
+	MOD  reduce 62
+	Q_MARK  reduce 62
+	COLON  reduce 62
+	COMMA  reduce 62
+	EQUAL  reduce 62
+	N_EQUAL  reduce 62
+	GREAT_EQ  reduce 62
+	LESS_EQ  reduce 62
+	AND  reduce 62
+	OR  reduce 62
+	PPLUS  reduce 62
+	MMINUS  reduce 62
+	ASSIGN_ADD  reduce 62
+	ASSIGN_TIMES  reduce 62
+	ASSIGN_DIV  reduce 62
+	ASSIGN_MOD  reduce 62
+	SEMICOLON  reduce 62
+	RPAREN  reduce 62
+	RBRACK  reduce 62
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 101
+	parameter : BYREF typea IDENT .  (28)
+
+	.  reduce 28
+
+
+state 102
+	func_declaration : VOID IDENT LPAREN op_parameter_list RPAREN SEMICOLON .  (22)
+
+	.  reduce 22
+
+
+state 103
+	func_definition : VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK . declarations statements RCBRACK  (31)
+	declarations : .  (32)
+
+	.  reduce 32
+
+	declarations  goto 118
+
+
+state 104
+	parameters : COMMA parameter . parameters  (27)
+	parameters : .  (26)
+
+	COMMA  shift 65
+	RPAREN  reduce 26
+
+	parameters  goto 119
+
+
+state 105
+	func_declaration : typea IDENT LPAREN op_parameter_list RPAREN SEMICOLON .  (21)
+
+	.  reduce 21
+
+
+state 106
+	func_definition : typea IDENT LPAREN op_parameter_list RPAREN LCBRACK . declarations statements RCBRACK  (30)
+	declarations : .  (32)
+
+	.  reduce 32
+
+	declarations  goto 120
+
+
+state 107
+	op_brack_exp : LBRACK . expression RBRACK  (74)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 121
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 108
+	expression : NEW typea op_brack_exp .  (64)
+
+	.  reduce 64
+
+
+state 109
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+	expression_list : expression .  (75)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	RPAREN  reduce 75
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 110
+	op_exp_list : expression_list .  (72)
+	expression_list : expression_list . COMMA expression  (76)
+
+	COMMA  shift 122
+	RPAREN  reduce 72
+
+
+state 111
+	expression : IDENT LPAREN op_exp_list . RPAREN  (60)
+
+	RPAREN  shift 123
+	.  error
+
+
+state 112
+	expression : LPAREN typea RPAREN . expression  (63)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 124
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 113
+	expression : LPAREN expression RPAREN .  (52)
+
+	.  reduce 52
+
+
+state 114
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+	expression : expression Q_MARK expression . COLON expression  (70)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COLON  shift 125
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	.  error
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 115
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression LBRACK expression . RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	RBRACK  shift 126
+	.  error
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+116: shift/reduce conflict (shift 90, reduce 67) on ASSIGN_MINUS
+116: shift/reduce conflict (shift 94, reduce 67) on LBRACK
+state 116
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression binary_op expression .  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	MOD  shift 80
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 67
+	GREATER  reduce 67
+	LESS  reduce 67
+	Q_MARK  reduce 67
+	COLON  reduce 67
+	COMMA  reduce 67
+	EQUAL  reduce 67
+	N_EQUAL  reduce 67
+	GREAT_EQ  reduce 67
+	LESS_EQ  reduce 67
+	AND  reduce 67
+	OR  reduce 67
+	ASSIGN_ADD  reduce 67
+	ASSIGN_TIMES  reduce 67
+	ASSIGN_DIV  reduce 67
+	ASSIGN_MOD  reduce 67
+	SEMICOLON  reduce 67
+	RPAREN  reduce 67
+	RBRACK  reduce 67
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+117: shift/reduce conflict (shift 90, reduce 69) on ASSIGN_MINUS
+117: shift/reduce conflict (shift 94, reduce 69) on LBRACK
+state 117
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression binary_assignment expression .  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	MOD  shift 80
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 69
+	GREATER  reduce 69
+	LESS  reduce 69
+	Q_MARK  reduce 69
+	COLON  reduce 69
+	COMMA  reduce 69
+	EQUAL  reduce 69
+	N_EQUAL  reduce 69
+	GREAT_EQ  reduce 69
+	LESS_EQ  reduce 69
+	AND  reduce 69
+	OR  reduce 69
+	ASSIGN_ADD  reduce 69
+	ASSIGN_TIMES  reduce 69
+	ASSIGN_DIV  reduce 69
+	ASSIGN_MOD  reduce 69
+	SEMICOLON  reduce 69
+	RPAREN  reduce 69
+	RBRACK  reduce 69
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 118
+	func_definition : VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations . statements RCBRACK  (31)
+	declarations : declarations . declaration  (33)
+	statements : .  (34)
+
+	BOOL  shift 5
+	DOUBLE  shift 6
+	INT  shift 7
+	VOID  shift 8
+	CHAR  shift 9
+	BREAK  reduce 34
+	CONTINUE  reduce 34
+	DELETE  reduce 34
+	FOR  reduce 34
+	FALSE  reduce 34
+	IF  reduce 34
+	NEW  reduce 34
+	INT_NUM  reduce 34
+	DOUBLE_NUM  reduce 34
+	NULL  reduce 34
+	RETURN  reduce 34
+	TRUE  reduce 34
+	IDENT  reduce 34
+	CHAR_V  reduce 34
+	STRING  reduce 34
+	PLUS  reduce 34
+	MINUS  reduce 34
+	TIMES  reduce 34
+	AMPERSAND  reduce 34
+	NOT  reduce 34
+	PPLUS  reduce 34
+	MMINUS  reduce 34
+	SEMICOLON  reduce 34
+	LPAREN  reduce 34
+	LCBRACK  reduce 34
+	RCBRACK  reduce 34
+
+	declaration  goto 127
+	var_declaration  goto 14
+	func_declaration  goto 15
+	func_definition  goto 16
+	typea  goto 17
+	b_typea  goto 18
+	statements  goto 128
+
+
+state 119
+	parameters : COMMA parameter parameters .  (27)
+
+	.  reduce 27
+
+
+state 120
+	func_definition : typea IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations . statements RCBRACK  (30)
+	declarations : declarations . declaration  (33)
+	statements : .  (34)
+
+	BOOL  shift 5
+	DOUBLE  shift 6
+	INT  shift 7
+	VOID  shift 8
+	CHAR  shift 9
+	BREAK  reduce 34
+	CONTINUE  reduce 34
+	DELETE  reduce 34
+	FOR  reduce 34
+	FALSE  reduce 34
+	IF  reduce 34
+	NEW  reduce 34
+	INT_NUM  reduce 34
+	DOUBLE_NUM  reduce 34
+	NULL  reduce 34
+	RETURN  reduce 34
+	TRUE  reduce 34
+	IDENT  reduce 34
+	CHAR_V  reduce 34
+	STRING  reduce 34
+	PLUS  reduce 34
+	MINUS  reduce 34
+	TIMES  reduce 34
+	AMPERSAND  reduce 34
+	NOT  reduce 34
+	PPLUS  reduce 34
+	MMINUS  reduce 34
+	SEMICOLON  reduce 34
+	LPAREN  reduce 34
+	LCBRACK  reduce 34
+	RCBRACK  reduce 34
+
+	declaration  goto 127
+	var_declaration  goto 14
+	func_declaration  goto 15
+	func_definition  goto 16
+	typea  goto 17
+	b_typea  goto 18
+	statements  goto 129
+
+
+state 121
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+	op_brack_exp : LBRACK expression . RBRACK  (74)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	RBRACK  shift 130
+	.  error
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 122
+	expression_list : expression_list COMMA . expression  (76)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 131
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 123
+	expression : IDENT LPAREN op_exp_list RPAREN .  (60)
+
+	.  reduce 60
+
+
+124: shift/reduce conflict (shift 90, reduce 63) on ASSIGN_MINUS
+124: shift/reduce conflict (shift 94, reduce 63) on LBRACK
+state 124
+	expression : LPAREN typea RPAREN expression .  (63)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 63
+	PLUS  reduce 63
+	MINUS  reduce 63
+	TIMES  reduce 63
+	DIV  reduce 63
+	GREATER  reduce 63
+	LESS  reduce 63
+	MOD  reduce 63
+	Q_MARK  reduce 63
+	COLON  reduce 63
+	COMMA  reduce 63
+	EQUAL  reduce 63
+	N_EQUAL  reduce 63
+	GREAT_EQ  reduce 63
+	LESS_EQ  reduce 63
+	AND  reduce 63
+	OR  reduce 63
+	ASSIGN_ADD  reduce 63
+	ASSIGN_TIMES  reduce 63
+	ASSIGN_DIV  reduce 63
+	ASSIGN_MOD  reduce 63
+	SEMICOLON  reduce 63
+	RPAREN  reduce 63
+	RBRACK  reduce 63
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 125
+	expression : expression Q_MARK expression COLON . expression  (70)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 132
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 126
+	expression : expression LBRACK expression RBRACK .  (66)
+
+	.  reduce 66
+
+
+state 127
+	declarations : declarations declaration .  (33)
+
+	.  reduce 33
+
+
+state 128
+	func_definition : VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements . RCBRACK  (31)
+	statements : statements . statement  (35)
+	op_ident_colon : .  (38)
+
+	BREAK  shift 133
+	CONTINUE  shift 134
+	DELETE  shift 38
+	FALSE  shift 39
+	IF  shift 135
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	RETURN  shift 136
+	TRUE  shift 44
+	IDENT  shift 137
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	SEMICOLON  shift 138
+	LPAREN  shift 55
+	LCBRACK  shift 139
+	RCBRACK  shift 140
+	FOR  reduce 38
+
+	statement  goto 141
+	op_ident_colon  goto 142
+	expression  goto 143
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 129
+	func_definition : typea IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements . RCBRACK  (30)
+	statements : statements . statement  (35)
+	op_ident_colon : .  (38)
+
+	BREAK  shift 133
+	CONTINUE  shift 134
+	DELETE  shift 38
+	FALSE  shift 39
+	IF  shift 135
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	RETURN  shift 136
+	TRUE  shift 44
+	IDENT  shift 137
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	SEMICOLON  shift 138
+	LPAREN  shift 55
+	LCBRACK  shift 139
+	RCBRACK  shift 144
+	FOR  reduce 38
+
+	statement  goto 141
+	op_ident_colon  goto 142
+	expression  goto 143
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 130
+	op_brack_exp : LBRACK expression RBRACK .  (74)
+
+	.  reduce 74
+
+
+state 131
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+	expression_list : expression_list COMMA expression .  (76)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	COMMA  reduce 76
+	RPAREN  reduce 76
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+132: shift/reduce conflict (shift 90, reduce 70) on ASSIGN_MINUS
+132: shift/reduce conflict (shift 94, reduce 70) on LBRACK
+state 132
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+	expression : expression Q_MARK expression COLON expression .  (70)
+
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_MINUS  shift 90
+	LBRACK  shift 94
+	ASSIGN  reduce 70
+	Q_MARK  reduce 70
+	COLON  reduce 70
+	COMMA  reduce 70
+	ASSIGN_ADD  reduce 70
+	ASSIGN_TIMES  reduce 70
+	ASSIGN_DIV  reduce 70
+	ASSIGN_MOD  reduce 70
+	SEMICOLON  reduce 70
+	RPAREN  reduce 70
+	RBRACK  reduce 70
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 133
+	statement : BREAK . op_ident SEMICOLON  (49)
+	op_ident : .  (40)
+
+	IDENT  shift 145
+	SEMICOLON  reduce 40
+
+	op_ident  goto 146
+
+
+state 134
+	statement : CONTINUE . op_ident SEMICOLON  (48)
+	op_ident : .  (40)
+
+	IDENT  shift 145
+	SEMICOLON  reduce 40
+
+	op_ident  goto 147
+
+
+state 135
+	statement : IF . LPAREN expression RPAREN statement  (45)
+	statement : IF . LPAREN expression RPAREN statement ELSE statement  (46)
+
+	LPAREN  shift 148
+	.  error
+
+
+state 136
+	statement : RETURN . op_exp SEMICOLON  (50)
+	op_exp : .  (36)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	SEMICOLON  reduce 36
+
+	op_exp  goto 149
+	expression  goto 150
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 137
+	op_ident_colon : IDENT . COLON  (39)
+	expression : IDENT .  (51)
+	expression : IDENT . LPAREN op_exp_list RPAREN  (60)
+
+	COLON  shift 151
+	LPAREN  shift 70
+	ASSIGN  reduce 51
+	PLUS  reduce 51
+	MINUS  reduce 51
+	TIMES  reduce 51
+	DIV  reduce 51
+	GREATER  reduce 51
+	LESS  reduce 51
+	MOD  reduce 51
+	Q_MARK  reduce 51
+	COMMA  reduce 51
+	EQUAL  reduce 51
+	N_EQUAL  reduce 51
+	GREAT_EQ  reduce 51
+	LESS_EQ  reduce 51
+	AND  reduce 51
+	OR  reduce 51
+	PPLUS  reduce 51
+	MMINUS  reduce 51
+	ASSIGN_ADD  reduce 51
+	ASSIGN_MINUS  reduce 51
+	ASSIGN_TIMES  reduce 51
+	ASSIGN_DIV  reduce 51
+	ASSIGN_MOD  reduce 51
+	SEMICOLON  reduce 51
+	LBRACK  reduce 51
+
+
+state 138
+	statement : SEMICOLON .  (42)
+
+	.  reduce 42
+
+
+state 139
+	statement : LCBRACK . statements RCBRACK  (44)
+	statements : .  (34)
+
+	.  reduce 34
+
+	statements  goto 152
+
+
+state 140
+	func_definition : VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK .  (31)
+
+	.  reduce 31
+
+
+state 141
+	statements : statements statement .  (35)
+
+	.  reduce 35
+
+
+state 142
+	statement : op_ident_colon . FOR LPAREN op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement  (47)
+
+	FOR  shift 153
+	.  error
+
+
+state 143
+	statement : expression . SEMICOLON  (43)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	SEMICOLON  shift 154
+	LBRACK  shift 94
+	.  error
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 144
+	func_definition : typea IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK .  (30)
+
+	.  reduce 30
+
+
+state 145
+	op_ident : IDENT .  (41)
+
+	.  reduce 41
+
+
+state 146
+	statement : BREAK op_ident . SEMICOLON  (49)
+
+	SEMICOLON  shift 155
+	.  error
+
+
+state 147
+	statement : CONTINUE op_ident . SEMICOLON  (48)
+
+	SEMICOLON  shift 156
+	.  error
+
+
+state 148
+	statement : IF LPAREN . expression RPAREN statement  (45)
+	statement : IF LPAREN . expression RPAREN statement ELSE statement  (46)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	.  error
+
+	expression  goto 157
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 149
+	statement : RETURN op_exp . SEMICOLON  (50)
+
+	SEMICOLON  shift 158
+	.  error
+
+
+state 150
+	op_exp : expression .  (37)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	LBRACK  shift 94
+	SEMICOLON  reduce 37
+	RPAREN  reduce 37
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 151
+	op_ident_colon : IDENT COLON .  (39)
+
+	.  reduce 39
+
+
+state 152
+	statements : statements . statement  (35)
+	statement : LCBRACK statements . RCBRACK  (44)
+	op_ident_colon : .  (38)
+
+	BREAK  shift 133
+	CONTINUE  shift 134
+	DELETE  shift 38
+	FALSE  shift 39
+	IF  shift 135
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	RETURN  shift 136
+	TRUE  shift 44
+	IDENT  shift 137
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	SEMICOLON  shift 138
+	LPAREN  shift 55
+	LCBRACK  shift 139
+	RCBRACK  shift 159
+	FOR  reduce 38
+
+	statement  goto 141
+	op_ident_colon  goto 142
+	expression  goto 143
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 153
+	statement : op_ident_colon FOR . LPAREN op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement  (47)
+
+	LPAREN  shift 160
+	.  error
+
+
+state 154
+	statement : expression SEMICOLON .  (43)
+
+	.  reduce 43
+
+
+state 155
+	statement : BREAK op_ident SEMICOLON .  (49)
+
+	.  reduce 49
+
+
+state 156
+	statement : CONTINUE op_ident SEMICOLON .  (48)
+
+	.  reduce 48
+
+
+state 157
+	statement : IF LPAREN expression . RPAREN statement  (45)
+	statement : IF LPAREN expression . RPAREN statement ELSE statement  (46)
+	expression : expression . LBRACK expression RBRACK  (66)
+	expression : expression . binary_op expression  (67)
+	expression : expression . unary_assignment  (68)
+	expression : expression . binary_assignment expression  (69)
+	expression : expression . Q_MARK expression COLON expression  (70)
+
+	ASSIGN  shift 73
+	PLUS  shift 74
+	MINUS  shift 75
+	TIMES  shift 76
+	DIV  shift 77
+	GREATER  shift 78
+	LESS  shift 79
+	MOD  shift 80
+	Q_MARK  shift 81
+	COMMA  shift 82
+	EQUAL  shift 83
+	N_EQUAL  shift 84
+	GREAT_EQ  shift 85
+	LESS_EQ  shift 86
+	AND  shift 87
+	OR  shift 88
+	PPLUS  shift 53
+	MMINUS  shift 54
+	ASSIGN_ADD  shift 89
+	ASSIGN_MINUS  shift 90
+	ASSIGN_TIMES  shift 91
+	ASSIGN_DIV  shift 92
+	ASSIGN_MOD  shift 93
+	RPAREN  shift 161
+	LBRACK  shift 94
+	.  error
+
+	unary_assignment  goto 95
+	binary_op  goto 96
+	binary_assignment  goto 97
+
+
+state 158
+	statement : RETURN op_exp SEMICOLON .  (50)
+
+	.  reduce 50
+
+
+state 159
+	statement : LCBRACK statements RCBRACK .  (44)
+
+	.  reduce 44
+
+
+state 160
+	statement : op_ident_colon FOR LPAREN . op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement  (47)
+	op_exp : .  (36)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	SEMICOLON  reduce 36
+
+	op_exp  goto 162
+	expression  goto 150
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 161
+	statement : IF LPAREN expression RPAREN . statement  (45)
+	statement : IF LPAREN expression RPAREN . statement ELSE statement  (46)
+	op_ident_colon : .  (38)
+
+	BREAK  shift 133
+	CONTINUE  shift 134
+	DELETE  shift 38
+	FALSE  shift 39
+	IF  shift 135
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	RETURN  shift 136
+	TRUE  shift 44
+	IDENT  shift 137
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	SEMICOLON  shift 138
+	LPAREN  shift 55
+	LCBRACK  shift 139
+	FOR  reduce 38
+
+	statement  goto 163
+	op_ident_colon  goto 142
+	expression  goto 143
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 162
+	statement : op_ident_colon FOR LPAREN op_exp . SEMICOLON op_exp SEMICOLON op_exp RPAREN statement  (47)
+
+	SEMICOLON  shift 164
+	.  error
+
+
+state 163
+	statement : IF LPAREN expression RPAREN statement .  (45)
+	statement : IF LPAREN expression RPAREN statement . ELSE statement  (46)
+
+	ELSE  shift 165
+	BREAK  reduce 45
+	CONTINUE  reduce 45
+	DELETE  reduce 45
+	FOR  reduce 45
+	FALSE  reduce 45
+	IF  reduce 45
+	NEW  reduce 45
+	INT_NUM  reduce 45
+	DOUBLE_NUM  reduce 45
+	NULL  reduce 45
+	RETURN  reduce 45
+	TRUE  reduce 45
+	IDENT  reduce 45
+	CHAR_V  reduce 45
+	STRING  reduce 45
+	PLUS  reduce 45
+	MINUS  reduce 45
+	TIMES  reduce 45
+	AMPERSAND  reduce 45
+	NOT  reduce 45
+	PPLUS  reduce 45
+	MMINUS  reduce 45
+	SEMICOLON  reduce 45
+	LPAREN  reduce 45
+	LCBRACK  reduce 45
+	RCBRACK  reduce 45
+
+
+state 164
+	statement : op_ident_colon FOR LPAREN op_exp SEMICOLON . op_exp SEMICOLON op_exp RPAREN statement  (47)
+	op_exp : .  (36)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	SEMICOLON  reduce 36
+
+	op_exp  goto 166
+	expression  goto 150
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 165
+	statement : IF LPAREN expression RPAREN statement ELSE . statement  (46)
+	op_ident_colon : .  (38)
+
+	BREAK  shift 133
+	CONTINUE  shift 134
+	DELETE  shift 38
+	FALSE  shift 39
+	IF  shift 135
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	RETURN  shift 136
+	TRUE  shift 44
+	IDENT  shift 137
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	SEMICOLON  shift 138
+	LPAREN  shift 55
+	LCBRACK  shift 139
+	FOR  reduce 38
+
+	statement  goto 167
+	op_ident_colon  goto 142
+	expression  goto 143
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 166
+	statement : op_ident_colon FOR LPAREN op_exp SEMICOLON op_exp . SEMICOLON op_exp RPAREN statement  (47)
+
+	SEMICOLON  shift 168
+	.  error
+
+
+state 167
+	statement : IF LPAREN expression RPAREN statement ELSE statement .  (46)
+
+	.  reduce 46
+
+
+state 168
+	statement : op_ident_colon FOR LPAREN op_exp SEMICOLON op_exp SEMICOLON . op_exp RPAREN statement  (47)
+	op_exp : .  (36)
+
+	DELETE  shift 38
+	FALSE  shift 39
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	TRUE  shift 44
+	IDENT  shift 45
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	LPAREN  shift 55
+	RPAREN  reduce 36
+
+	op_exp  goto 169
+	expression  goto 150
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 169
+	statement : op_ident_colon FOR LPAREN op_exp SEMICOLON op_exp SEMICOLON op_exp . RPAREN statement  (47)
+
+	RPAREN  shift 170
+	.  error
+
+
+state 170
+	statement : op_ident_colon FOR LPAREN op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN . statement  (47)
+	op_ident_colon : .  (38)
+
+	BREAK  shift 133
+	CONTINUE  shift 134
+	DELETE  shift 38
+	FALSE  shift 39
+	IF  shift 135
+	NEW  shift 40
+	INT_NUM  shift 41
+	DOUBLE_NUM  shift 42
+	NULL  shift 43
+	RETURN  shift 136
+	TRUE  shift 44
+	IDENT  shift 137
+	CHAR_V  shift 46
+	STRING  shift 47
+	PLUS  shift 48
+	MINUS  shift 49
+	TIMES  shift 50
+	AMPERSAND  shift 51
+	NOT  shift 52
+	PPLUS  shift 53
+	MMINUS  shift 54
+	SEMICOLON  shift 138
+	LPAREN  shift 55
+	LCBRACK  shift 139
+	FOR  reduce 38
+
+	statement  goto 171
+	op_ident_colon  goto 142
+	expression  goto 143
+	unary_op  goto 58
+	unary_assignment  goto 59
+
+
+state 171
+	statement : op_ident_colon FOR LPAREN op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement .  (47)
+
+	.  reduce 47
+
+
+State 68 contains 2 shift/reduce conflicts.
+State 69 contains 2 shift/reduce conflicts.
+State 99 contains 2 shift/reduce conflicts.
+State 100 contains 2 shift/reduce conflicts.
+State 116 contains 2 shift/reduce conflicts.
+State 117 contains 2 shift/reduce conflicts.
+State 124 contains 2 shift/reduce conflicts.
+State 132 contains 2 shift/reduce conflicts.
+
+
+72 terminals, 33 nonterminals
+106 grammar rules, 172 states

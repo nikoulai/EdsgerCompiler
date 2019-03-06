@@ -1,0 +1,29 @@
+Ast.cmo :
+Ast.cmx :
+Codegen.cmo :
+Codegen.cmx :
+Error.cmo : Error.cmi
+Error.cmx : Error.cmi
+Error.cmi :
+Hashcons.cmo : Hashcons.cmi
+Hashcons.cmx : Hashcons.cmi
+Hashcons.cmi :
+Identifier.cmo : Hashcons.cmi Identifier.cmi
+Identifier.cmx : Hashcons.cmx Identifier.cmi
+Identifier.cmi :
+Lexer.cmo : Parser.cmi Lexer.cmi
+Lexer.cmx : Parser.cmx Lexer.cmi
+Lexer.cmi : Parser.cmi
+Main.cmo : Parser.cmi Lexer.cmi Ast.cmo
+Main.cmx : Parser.cmx Lexer.cmx Ast.cmx
+Parser.cmo : Types.cmi Identifier.cmi Error.cmi Ast.cmo Parser.cmi
+Parser.cmx : Types.cmx Identifier.cmx Error.cmx Ast.cmx Parser.cmi
+Parser.cmi :
+Semantic.cmo : Ast.cmo
+Semantic.cmx : Ast.cmx
+Symbol.cmo : Types.cmi Identifier.cmi Error.cmi Symbol.cmi
+Symbol.cmx : Types.cmx Identifier.cmx Error.cmx Symbol.cmi
+Symbol.cmi : Types.cmi Identifier.cmi
+Types.cmo : Types.cmi
+Types.cmx : Types.cmi
+Types.cmi :
