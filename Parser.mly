@@ -190,6 +190,7 @@ b_typea: INT { Tint }
 | DOUBLE { Tdouble }
 | BOOL { Tbool } 
 | CHAR { Tchar }
+| VOID {Tvoid}
 ;
 
 declarator: IDENT { Decl ($1, None) }

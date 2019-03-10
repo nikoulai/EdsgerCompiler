@@ -392,11 +392,14 @@ and print_ast_bop ppf ast =
 
 and print_ast_type ppf ast =
   match ast with
-  | Tint ->   fprintf ppf "int ";
-  | Tchar ->   fprintf ppf "char ";
-  | Tbool ->   fprintf ppf "bool ";
-  | Tdouble ->   fprintf ppf "double ";
-  | Tptr (typ1) ->   print_ast_type ppf typ1; fprintf ppf "*";
+  | Tint -> fprintf ppf "int ";
+  | Tchar -> fprintf ppf "char ";
+  | Tbool -> fprintf ppf "bool ";
+  | Tdouble -> fprintf ppf "double ";
+  | Tptr (typ1) -> print_ast_type ppf typ1; fprintf ppf "*";
+  | Tarray (typ1,i) -> print_ast_type ppf typ1; fprintf ppf "["; fprintf ppf "%d" i; fprintf ppf "]";
+  | Tvoid -> fprintf ppf "void ";
+  | Tnone -> fprintf ppf "None type, probably an error ";
 
 and print_ast_res_type ppf ast =
   print_ast_type ppf ast

@@ -20,6 +20,9 @@ exception Terror of string
 | Tnone -> Printf.printf "This is none type \n"
 | Tvoid -> Printf.printf "This is void type \n"
 
+let get_entry_k entry = match entry.entry_info with
+|ENTRY_function x -> x
+
 let  getEntryType entr = match entr.entry_info with
 |ENTRY_variable x -> x.variable_type
 |ENTRY_function x -> x.function_result
@@ -89,7 +92,7 @@ let rec  getType expr = match expr with
         | Enew (x,_) -> x
         | Edel _ -> Tnone
         | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)
-(*        | ECall (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result*)
+        | Eapp (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result
         | _ -> Tnone
 and  castAllow x y = match (x,  y) with 
 | (Tdouble ,Tint)| (Tint,Tdouble) -> true
@@ -102,8 +105,25 @@ and  exprArray x = match getType x with
 | Tptr x1 -> x1
 | Tarray (x1,x2) ->x1
 | _ -> error "not a memory"; Tnone
-
-
+and check_name_lib name = match name with
+|"writeString" | "writeInteger" |"writeBoolean" | "writeChar" | "writeReal" | "readInteger" | "readBoolean" | "readChar" | "readReal" | "readString" | "abs" | "fabs" | "sqrt" |"sin" | "cos" | "tan" | "atan" | "exp" | "ln" |"pi" | "trunc" | "round" | "ord"|"chr" | "strlen" | "strcmp"|"strcpy" | "strcat"->true
+| _ -> false
+and get_name_lib name = match name with
+        |"writeString"  | "writeInteger" |"writeBoolean" | "writeChar" | "writeReal" -> Tvoid 
+        | "readInteger" -> Tint
+        | "readBoolean" -> Tbool 
+        | "readChar"->Tchar 
+        | "readReal" -> Tdouble 
+        | "readString"->Tptr (Tchar)
+         | "abs" -> Tint
+         | "fabs" | "sqrt" |"sin" | "cos" | "tan" | "atan" | "exp" | "ln" |"pi" -> Tdouble
+         | "trunc" | "round" -> Tint
+         | "ord" -> Tint
+         |"chr"-> Tchar 
+         | "strlen" ->Tint
+         | "strcmp" ->Tbool
+         |"strcpy"->Tvoid 
+         | "strcat"->Tvoid;;
 (* to compile with Str we use str.cma in ocaml *)
 
 let find_return =  ref false
@@ -226,7 +246,9 @@ and check_fun_type scope_typ typ =
   if (equalType scope_typ typ) then
     find_return := true
   else
-    ( Printf.printf("Return type and fun type are not the same\n");
+    ( Printf.printf("Return type and function type are not the same\nReturned: ");
+      (printType scope_typ);
+      (printType typ);
       raise Terminate )
 
 and check_main () = 
