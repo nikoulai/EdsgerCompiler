@@ -1,13 +1,13 @@
-To make the symbol table demo program:
+Compilers - NTUA
 
-   make depend-symbtest
-   make symbtest                or symbtest.exe (if in Windows)
+Implementation of compiler for Edsger programming language in OCaml, using ocamllex, ocamlyacc and LLVM.
 
-To make your compiler:
+Compile:    make depend
+            make all
 
-   1. Add your lexer (Lexer.mll, Lexer.mli) and parser (Parser.mly) files
-   2. Add any other files that you have and add them to the Makefile
-   3. Finally:
 
-   make depend
-   make
+
+
+Authors:
+Nikos Iliakis
+Aspa Skalidi
