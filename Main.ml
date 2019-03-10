@@ -14,7 +14,7 @@ let main =
     (try
       Parser.start Lexer.e_lang lexbuf;
       print_ast !ast_tree;
-      check !ast_tree;
+      check_program !ast_tree;
       (*infer !ast_tree;*)
       exit 0
     with 

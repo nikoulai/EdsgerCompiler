@@ -1,4 +1,5 @@
 open Format
+open Types
 
 type ast_declaration = Vardecl of ast_type * (ast_declarator list)
                     | Fundecl of ast_res_type * string * (ast_param list)
@@ -59,15 +60,16 @@ and ast_bas = Tba
              | Tbamod
              | Tbapl
              | Tbamin
-and ast_res_type = Tvoid
-                 | Ttype of ast_type             
-and ast_type = Tint
+and ast_res_type = ast_type             
+(*and ast_res_type = Tvoid
+                 | Ttype of ast_type             *)
+and ast_type = Types.typ
+(*and ast_type = Tint
               | Tchar
               | Tbool
               | Tdouble
               | Tptr of ast_type
-
-
+*)
 
 let ast_tree : (ast_declaration list) option ref = ref None
 
@@ -397,11 +399,11 @@ and print_ast_type ppf ast =
   | Tptr (typ1) ->   print_ast_type ppf typ1; fprintf ppf "*";
 
 and print_ast_res_type ppf ast =
-  match ast with
+  print_ast_type ppf ast
+(*  match ast with
   | Tvoid ->   fprintf ppf "void ";
   | Ttype typ ->   print_ast_type ppf typ;
-
-
+*)
 
 
 and pretty_print ppf ast =

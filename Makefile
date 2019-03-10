@@ -9,7 +9,7 @@ endif
 
 EXEFILE=main$(EXE)
 MLFILES=Ast.ml Codegen.ml Hashcons.ml Identifier.ml Error.ml Types.ml Symbol.ml \
-  Lexer.ml Parser.ml Main.ml Semantic.ml
+  Lexer.ml Parser.ml Semantic.ml Main.ml 
 MLIFILES=Hashcons.mli Identifier.mli Error.mli Types.mli Symbol.mli \
   Parser.mli Lexer.mli
 CMOFILES=$(patsubst %.ml,%.cmo,$(MLFILES))

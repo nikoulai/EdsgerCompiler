@@ -196,8 +196,8 @@ declarator: IDENT { Decl ($1, None) }
 | IDENT LBRACK constant_exp RBRACK { Decl ($1, Some $3) }
 ;
 
-func_declaration : typea IDENT LPAREN op_parameter_list RPAREN SEMICOLON { Fundecl ((Ttype $1), $2, $4) }
-| VOID IDENT LPAREN op_parameter_list RPAREN SEMICOLON { Fundecl (Tvoid, $2, $4) }
+func_declaration : typea IDENT LPAREN op_parameter_list RPAREN SEMICOLON { Fundecl (($1), $2, $4) }
+/*| VOID IDENT LPAREN op_parameter_list RPAREN SEMICOLON { Fundecl (Tvoid, $2, $4) }*/
 ;
 
 op_parameter_list: /* empty */ { [] }
@@ -223,8 +223,8 @@ parameter_list : parameter {}
 ;
 */
 
-func_definition: typea IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK { Fundefi ((Ttype $1), $2, $4, $7, $8) }
-| VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK { Fundefi (Tvoid, $2, $4, $7, $8) } 
+func_definition: typea IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK { Fundefi (($1), $2, $4, $7, $8) }
+/*| VOID IDENT LPAREN op_parameter_list RPAREN LCBRACK declarations statements RCBRACK { Fundefi (Tvoid, $2, $4, $7, $8) } */
 ;
 
 declarations: /* empty */ { [] }

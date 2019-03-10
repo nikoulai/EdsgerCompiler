@@ -1,11 +1,11 @@
-type typ = TYPE_none        (* no type (should not be used)       *)
-         | TYPE_int         (* int                                *)
-         | TYPE_char
-         | TYPE_bool
-         | TYPE_double
-         | TYPE_ptr of typ
-         | TYPE_array of typ * int (*immutable pointer*)
-         | TYPE_proc
+type typ = Tnone        (* no type (should not be used)       *)
+         | Tint         (* int                                *)
+         | Tchar
+         | Tbool
+         | Tdouble
+         | Tptr of typ
+         | Tarray of typ * int (*immutable pointer*)
+         | Tvoid
 
 val sizeOfType : typ -> int
 val equalType : typ -> typ -> bool

@@ -1,24 +1,24 @@
-type typ = TYPE_none
-         | TYPE_int
-         | TYPE_char
-         | TYPE_bool
-         | TYPE_double
-         | TYPE_ptr of typ
-         | TYPE_array of typ * int (*immutable pointer*)
-         | TYPE_proc
+type typ = Tnone
+         | Tint
+         | Tchar
+         | Tbool
+         | Tdouble
+         | Tptr of typ
+         | Tarray of typ * int (*immutable pointer*)
+         | Tvoid
 
 let rec sizeOfType t =
    match t with
-   | TYPE_int            -> 2
-   | TYPE_char           -> 1
-   | TYPE_bool           -> 1
-   | TYPE_double         -> 10
-   | TYPE_ptr et          -> 2
-   | TYPE_array (et, sz) -> sz * sizeOfType et (*immutable pointer has fixed size*)
+   | Tint            -> 2
+   | Tchar           -> 1
+   | Tbool           -> 1
+   | Tdouble         -> 10
+   | Tptr et          -> 2
+   | Tarray (et, sz) -> sz * sizeOfType et (*immutable pointer has fixed size*)
    | _                   -> 0
 
 let rec equalType t1 t2 =
    match t1, t2 with
-   | TYPE_array (et1, sz1), TYPE_array (et2, sz2) -> equalType et1 et2
-   | TYPE_ptr et1, TYPE_ptr et2                   -> equalType et1 et2
+   | Tarray (et1, sz1), Tarray (et2, sz2) -> equalType et1 et2
+   | Tptr et1, Tptr et2                   -> equalType et1 et2
    | _                                            -> t1 = t2

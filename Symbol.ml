@@ -71,7 +71,7 @@ let start_negative_offset = 0
 let the_outer_scope = {
   sco_parent = None;
   sco_nesting = 0;
-  sco_type = TYPE_proc;
+  sco_type = Tvoid;
   sco_entries = [];
   sco_negofs = start_negative_offset
 }
@@ -186,7 +186,7 @@ let newFunction id err =
       function_isForward = false;
       function_paramlist = [];
       function_redeflist = [];
-      function_result = TYPE_none;
+      function_result = Tnone;
       function_pstatus = PARDEF_DEFINE;
       function_initquad = 0
     } in
