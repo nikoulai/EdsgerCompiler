@@ -1,7 +1,7 @@
 open Lexer
 open Format
 open Ast
-(*open Semantic*)
+open Semantic
 
 let main =
   let chan =
@@ -14,7 +14,7 @@ let main =
     (try
       Parser.start Lexer.e_lang lexbuf;
       print_ast !ast_tree;
-      (*check !ast_tree;*)
+      check !ast_tree;
       (*infer !ast_tree;*)
       exit 0
     with 

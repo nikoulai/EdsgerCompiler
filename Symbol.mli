@@ -1,74 +1,76 @@
-(* Symbol table *)
-
+module H :
+  sig
+    type key = Identifier.id
+    type 'a t
+    val create : int -> 'a t
+    val clear : 'a t -> unit
+    val reset : 'a t -> unit
+    val copy : 'a t -> 'a t
+    val add : 'a t -> key -> 'a -> unit
+    val remove : 'a t -> key -> unit
+    val find : 'a t -> key -> 'a
+    val find_all : 'a t -> key -> 'a list
+    val replace : 'a t -> key -> 'a -> unit
+    val mem : 'a t -> key -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val filter_map_inplace : (key -> 'a -> 'a option) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val length : 'a t -> int
+    val stats : 'a t -> Hashtbl.statistics
+  end
 type pass_mode = PASS_BY_VALUE | PASS_BY_REFERENCE
-
-type param_status =
-  | PARDEF_COMPLETE                             (* Πλήρης ορισμός     *)
-  | PARDEF_DEFINE                               (* Εν μέσω ορισμού    *)
-  | PARDEF_CHECK                                (* Εν μέσω ελέγχου    *)
-
+type param_status = PARDEF_COMPLETE | PARDEF_DEFINE | PARDEF_CHECK
 type scope = {
   sco_parent : scope option;
   sco_nesting : int;
+  sco_type : Types.typ;
   mutable sco_entries : entry list;
-  mutable sco_negofs : int
+  mutable sco_negofs : int;
 }
-
-and variable_info = {                         (******* Μεταβλητή *******)
-  variable_type   : Types.typ;                (* Τύπος                 *)
-  variable_offset : int                       (* Offset στο Ε.Δ.       *)
+and variable_info = { variable_type : Types.typ; variable_offset : int; }
+and function_info = {
+  mutable function_isForward : bool;
+  mutable function_paramlist : entry list;
+  mutable function_redeflist : entry list;
+  mutable function_result : Types.typ;
+  mutable function_pstatus : param_status;
+  mutable function_initquad : int;
 }
-
-and function_info = {                         (******* Συνάρτηση *******)
-  mutable function_isForward : bool;          (* Δήλωση forward        *)
-  mutable function_paramlist : entry list;    (* Λίστα παραμέτρων      *)
-  mutable function_redeflist : entry list;    (* Λίστα παραμέτρων (2η) *)
-  mutable function_result    : Types.typ;     (* Τύπος αποτελέσματος   *)
-  mutable function_pstatus   : param_status;  (* Κατάσταση παραμέτρων  *)
-  mutable function_initquad  : int            (* Αρχική τετράδα        *)
+and parameter_info = {
+  parameter_type : Types.typ;
+  mutable parameter_offset : int;
+  parameter_mode : pass_mode;
 }
-
-and parameter_info = {                        (****** Παράμετρος *******)
-  parameter_type           : Types.typ;       (* Τύπος                 *)
-  mutable parameter_offset : int;             (* Offset στο Ε.Δ.       *)
-  parameter_mode           : pass_mode        (* Τρόπος περάσματος     *)
-}
-
-and temporary_info = {                        (** Προσωρινή μεταβλητή **)
-  temporary_type   : Types.typ;               (* Τύπος                 *)
-  temporary_offset : int                      (* Offset στο Ε.Δ.       *)
-}
-
-and entry_info = ENTRY_none
-               | ENTRY_variable of variable_info
-               | ENTRY_function of function_info
-               | ENTRY_parameter of parameter_info
-               | ENTRY_temporary of temporary_info
-
+and temporary_info = { temporary_type : Types.typ; temporary_offset : int; }
+and entry_info =
+    ENTRY_none
+  | ENTRY_variable of variable_info
+  | ENTRY_function of function_info
+  | ENTRY_parameter of parameter_info
+  | ENTRY_temporary of temporary_info
 and entry = {
-  entry_id    : Identifier.id;
+  entry_id : Identifier.id;
   entry_scope : scope;
-  entry_info  : entry_info
+  entry_info : entry_info;
 }
-
 type lookup_type = LOOKUP_CURRENT_SCOPE | LOOKUP_ALL_SCOPES
-
-val currentScope : scope ref              (* Τρέχουσα εμβέλεια         *)
-val quadNext : int ref                    (* Αριθμός επόμενης τετράδας *)
-val tempNumber : int ref                  (* Αρίθμηση των temporaries  *)
-
-val initSymbolTable  : int -> unit
-val openScope        : unit -> unit
-val closeScope       : unit -> unit
-val newVariable      : Identifier.id -> Types.typ -> bool -> entry
-val newFunction      : Identifier.id -> bool -> entry
-val newParameter     : Identifier.id -> Types.typ -> pass_mode ->
-                                        entry -> bool -> entry
-val newTemporary     : Types.typ -> entry
-
-val forwardFunction   : entry -> unit
+val start_positive_offset : int
+val start_negative_offset : int
+val the_outer_scope : scope
+val no_entry : Identifier.id -> entry
+val currentScope : scope ref
+val quadNext : int ref
+val tempNumber : int ref
+val tab : entry H.t ref
+val initSymbolTable : int -> unit
+val openScope : Types.typ -> unit
+val closeScope : unit -> unit
+exception Failure_NewEntry of entry
+val newEntry : H.key -> entry_info -> bool -> entry
+val lookupEntry : H.key -> lookup_type -> bool -> entry
+val newVariable : H.key -> Types.typ -> bool -> entry
+val newFunction : H.key -> bool -> entry
+val newParameter : H.key -> Types.typ -> pass_mode -> entry -> bool -> entry
+val newTemporary : Types.typ -> entry
+val forwardFunction : entry -> unit
 val endFunctionHeader : entry -> Types.typ -> unit
-val lookupEntry       : Identifier.id -> lookup_type -> bool -> entry
-
-val start_positive_offset : int   (* Αρχικό θετικό offset στο Ε.Δ.   *)
-val start_negative_offset : int   (* Αρχικό αρνητικό offset στο Ε.Δ. *)
