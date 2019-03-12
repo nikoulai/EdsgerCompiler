@@ -1,5 +1,5 @@
 open Llvm
-open Ast 
+(*open Ast 
 open Types 
 exception Error of string
 
@@ -177,3 +177,4 @@ let codegen_main main =
 
 
 
+*)
