@@ -1,0 +1,24 @@
+void main () {
+    int i,j;
+    outlabel: for (i=0; i<100; i++) {
+        inlabel: for (j=5; j<10; j--) {
+            continue inlabel; 
+            continue outlabel; 
+            continue;
+            9*5; 
+        }
+    }
+}
+void btest () {
+    int i,j;
+    outb: for (i=0; i<1; i++) {
+        inb: for (j = 9 ; j < 8 ; j -- ) {
+            break inb; 
+            break outb;
+            break;
+            9*5;
+        } 
+        9*4;
+    }
+    9*3;
+}

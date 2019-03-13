@@ -1,0 +1,18 @@
+void lol(int ** a) {
+     return;
+}
+
+void main() {
+     int a[100];
+     int *b;
+     b = a;
+     b += 5;
+}
+
+void yet_another_pointer_test () {
+     int * z[100];
+     int b;
+
+     b = z[100][9];
+     z[1] = NULL;
+}

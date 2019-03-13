@@ -1,0 +1,12 @@
+void main() {
+     int a[100];
+     int *b;
+     int *c;
+     int t;
+
+     c = a+10;
+     b = b+3;
+     c = a-9;
+     t = *(a+3);
+     t = *c;
+}

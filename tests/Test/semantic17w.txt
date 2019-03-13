@@ -1,0 +1,4 @@
+void main () {
+    double* i;
+    i = +9.0;
+}

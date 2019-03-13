@@ -1,0 +1,13 @@
+#include "stdio.h"
+#include "math.h"
+void main()
+{
+	double foo(double x, double y){
+		double result;
+		result = sqrt(x)+sqrt(y);
+		return result;
+	}
+	writeReal(foo((8.0,9.0),16.0));
+	writeString("\n");
+	
+}

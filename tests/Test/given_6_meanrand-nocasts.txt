@@ -1,0 +1,25 @@
+//void writeString(char * msg);
+//int readInteger();
+//void writeReal(double n);
+
+void main ()
+{
+    int n, k;
+    int sum, seed, i;
+
+   //writeString("Give n: ");
+    //n = readInteger();
+    //writeString("Give k: ");
+    //k = readInteger();
+    n = 5;
+    k = 8;    
+
+    for (i = 0, sum = 0, seed = 65; i < 5; i++)
+        sum += (seed = (seed * 137 + 221 + i));
+    
+    if (k > 0) {
+      //  writeString("Mean: ");
+        //writeReal(sum / 5);
+        //writeString("\n");
+    }
+}

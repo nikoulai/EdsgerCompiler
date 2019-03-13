@@ -1,0 +1,10 @@
+#include "mystdio.h"
+void main()
+{
+	int x,y;
+	writeString("Written string...\n");
+	x=-42;
+	y=abs(x);
+	writeInteger(y);
+	writeString("\n");
+}

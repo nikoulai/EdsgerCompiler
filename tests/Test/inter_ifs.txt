@@ -1,0 +1,64 @@
+void main () {
+     int x;
+    if (true) {
+       99999999*9;
+    } else if (true) 
+       88888888*8;
+    else {
+       77777777*7;
+    }
+    if (x<1) {
+       100*100;
+    }
+}
+
+void main2 () {
+     int x;
+     if (x<1 && x>3) {
+       100*100;
+    }
+}
+
+void main3 () {
+     int x;
+     if (true && 9<10) {
+       100*100;
+    }
+}
+
+void main4 () {
+     int n;
+     bool a,b;
+
+     a = true;
+     b = false;
+     
+}
+
+void main5 () {
+     bool a;
+     a = 1<2 || 3<4;
+}
+void main6 () {
+     bool a; 
+     a = false || true;
+}
+
+void main7 () {
+     bool a; 
+     a = false && true;
+}
+
+void main8 () {
+     bool a; 
+     a = 9<3 && true;
+}
+void main9 () {
+     bool a; 
+     a = 9<10 && 11<12 && true;
+}
+
+void main10 () {
+     bool a;
+     a = (9<2 || 10<3)?(true) : (true && true);
+}

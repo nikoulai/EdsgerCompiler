@@ -1,0 +1,14 @@
+void main() 
+{
+	writeString();
+	secondCall("Hello");
+	numberOfRings = readInteger();
+    rings = 2 * 3;
+	if (rings >= 2 ) 
+	{ 
+		hanoi(source,auxiliary,target,rings-1);
+		move(source,target);
+	} else {
+		printf("Hello darling %s", "you good?");	
+	}
+}

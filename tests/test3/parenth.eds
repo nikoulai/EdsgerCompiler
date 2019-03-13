@@ -1,0 +1,10 @@
+#include "stdio.h"
+
+int fun(double a, bool b) {
+	return (int) a + (int) b;
+}
+
+void main() {
+	writeInteger(fun ((36, 2.0), true));
+	writeString("\n");
+}

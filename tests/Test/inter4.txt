@@ -1,0 +1,31 @@
+int test (byref int i,int j, int k) {
+    return 9;
+}
+void main () {
+    int j;
+    return;
+    j = test(9,8,6);
+}
+
+void testarray() {
+    int a[100]; 
+    int i,j;
+    char k;
+    a[100*100] = a[19*20];
+    i = j = 3*20+8;
+    k = '9';
+
+
+}
+
+void test_pointers () {
+    int ** i;
+    int j;
+    int **k;
+
+    i = &(&j);
+    k = **i; 
+}
+void testnums () {
+    -3*2;
+}

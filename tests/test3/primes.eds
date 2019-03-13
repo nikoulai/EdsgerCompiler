@@ -1,0 +1,47 @@
+#include "stdio.h"
+
+int checkPrimeNumber(int n);
+
+void main()
+{
+    int n1, n2, i, flag;
+
+    writeString("Enter two positive integers: ");
+    n1 = readInteger();
+    n2 = readInteger();
+    writeString("Prime numberbers between ");
+    writeInteger(n1);
+    writeString(" and ");
+    writeInteger(n2);
+    writeString(" are: ");
+
+    for(i=n1+1; i<n2; ++i)
+    {
+        // i is a prime number, flag will be equal to 1
+        flag = checkPrimeNumber(i);
+
+        if(flag == 1) {
+            writeInteger(i);
+            writeString(" ");
+        }
+    }
+    writeChar('\n');
+    return;
+}
+
+// user-defined function to check prime number
+int checkPrimeNumber(int n)
+{
+    int j, flag;
+    flag = 1;
+
+    for(j=2; j <= n/2; ++j)
+    {
+        if (n%j == 0)
+        {
+            flag =0;
+            break;
+        }
+    }
+    return flag;
+}

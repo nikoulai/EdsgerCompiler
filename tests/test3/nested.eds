@@ -1,0 +1,102 @@
+//testcase axillea
+
+#include "stdio.h"
+#include "math.h"
+#include "stdlib.h"
+
+int Initialize(byref int x) {
+    x = 42;
+
+    return x + 123;
+}
+
+void SomeFunc(int a) {
+    int x;
+    int ForwardDeclared(int b);
+    
+    void NestedFirstLevel(int a) {
+        int integ;
+
+        int NestedSecondLevel() {
+            int cantThinkOfAName;
+            cantThinkOfAName = ForwardDeclared(x);
+
+            writeString("cantThinkOfAName: ");
+            writeInteger(cantThinkOfAName);
+            writeChar('\n');
+
+            return cantThinkOfAName - 102 + x;
+        }
+
+        integ = a;
+        writeString("integ: ");
+        writeInteger(integ);
+        writeChar('\n');
+        integ += NestedSecondLevel();
+        x = integ;
+    }    
+
+    int somethingElse;
+
+    int ForwardDeclared(int b) {
+        if (b > 0)
+            return 1 + ForwardDeclared(--b);
+        somethingElse = 12;
+
+        return 42;
+    }
+
+    x = 100;
+    somethingElse = 17;
+    writeString("x before nestedFirstLevel: ");
+    writeInteger(x);
+    writeChar('\n');
+    NestedFirstLevel(17);
+    writeString("x after nestedFirstLevel (should be 157): ");
+    writeInteger(x);
+    writeChar('\n');
+    
+    writeString("somethingElse after nestedFirstLevel (should be 12): ");
+    writeInteger(somethingElse);
+    writeChar('\n');
+}
+
+void FillAndPrint(int* arr, int nElements) {
+    int i;
+    
+    arr[0] = 17;
+    for (i = 1; i < nElements; i++) {
+        writeString("arr[");
+        writeInteger(i - 1);
+        writeString("] = ");
+        writeInteger(arr[i-1]);
+        writeChar('\n');
+        arr[i] = (nElements - i) % arr[i - 1];
+        if (arr[i] == 0)
+            arr[i] = nElements - i;
+    }
+}
+
+void main() {
+    int a;
+    int x[42];
+    int i;
+
+    Initialize(a);
+    writeInteger(a);
+    writeChar('\n');
+
+    SomeFunc(42); 
+
+    x[0] = 17;
+    for (i = 1; i < a; i++) {
+        writeString("x[");
+        writeInteger(i - 1);
+        writeString("] = ");
+        writeInteger(x[i-1]);
+        writeChar('\n');
+        x[i] = (a - i) % x[i - 1];
+        if (x[i] == 0)
+            x[i] = a - i;
+    }
+}

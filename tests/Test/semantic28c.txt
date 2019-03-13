@@ -1,0 +1,9 @@
+#include "stdio.h"
+
+void main() {
+  char c,d;
+  c = 'x';
+  d = readChar();
+  writeChar(c);
+  writeString("\n");
+}

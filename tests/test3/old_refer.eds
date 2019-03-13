@@ -1,0 +1,21 @@
+#include "stdio.h"
+
+void main ()
+{
+  void fun(byref int * x)
+  {
+    writeString("Old value:");
+    writeInteger(x[0]);
+	  writeChar('\n');
+    x[0]+=20;
+  }
+
+  int *y; // [2];
+  y = new int[2];
+  y[0] = 22;
+  fun(y);
+  writeString("New value:");
+  writeInteger(y[0]);
+  writeChar('\n');
+  delete y;
+}

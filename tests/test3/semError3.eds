@@ -1,0 +1,44 @@
+/*Not same type in assignement (l.14)*/
+/*No for stmt to break (l.17)*/
+int foo1();	/*result type mismatch (l.20)*/
+void writeString(char *x);
+void writeInteger(int x);
+
+void bsort (int * x, int n)
+{
+	int i;
+	bool changed;
+	void swap (byref int x, byref int y)
+	{
+		char t;
+		t = x;
+		y = t;
+	}
+	break ;
+
+}
+void foo1(){
+	return ;
+}
+
+void main ()
+{
+	void printArray (char * msg, int * x, int n)
+	{
+		int i;
+		writeString(msg);
+		for (i = 0; i < n; i++) {
+			if (i > 0)
+				writeString(", ");
+			writeInteger(x[i]);
+		}
+		writeString("\n");
+
+	}
+	int i, x[16], seed;
+	for (i = 0, seed = 65; i < 16; i++)
+		x[i] = seed = (seed * 137 + 221 + i) % 101;
+	printArray("Initial array: ", x, 16);
+	bsort(x, 16);
+	printArray("Sorted array: ", x, 16);
+}

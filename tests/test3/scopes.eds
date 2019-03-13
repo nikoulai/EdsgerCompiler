@@ -1,0 +1,49 @@
+#include "stdio.h"
+
+int x;
+bool flag;
+
+int fun1(int a, double b) {
+	int sub_b (int c) {
+		return c - (int) b;
+	}
+
+	flag = x++ == 5 ? true : false;
+
+	return flag ? sub_b (a) : (b = 1.0, sub_b (a));
+}
+
+
+void fun2 () {
+	bool glob_flag;
+	void nested (int x, bool flag) {
+		writeInteger(x);
+		writeChar(' ');
+		writeBoolean(flag);
+//		writeChar('\n');
+	}
+	int glob_int;
+
+	nested(2, true);
+	writeString("Exprected \"2 true\"\n");
+
+	writeInteger(x);
+	writeChar(' ');
+	writeBoolean(flag);
+//	writeChar('\n');
+	writeString("Exprected \"11 false\"\n");
+
+}
+
+void main () {
+	int i;
+	x = 1;
+	for (i = 0; i < 10; i++) {
+		writeInteger (fun1 (x, 2.0));
+		writeChar (' ');
+	}
+	writeString("\nExprected: 0 1 2 3 3 5 6 7 8 9\n");
+
+	fun2();
+
+}

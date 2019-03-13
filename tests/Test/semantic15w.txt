@@ -1,0 +1,6 @@
+void main() {
+     int a[100];
+     int t;
+
+     t = **(a+3);
+}

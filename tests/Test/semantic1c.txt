@@ -1,0 +1,19 @@
+char *l[10];
+bool k[5+9*5], delta,epsilon;
+double *z;
+
+int my_fun(int***x, char y);
+
+// This is allowed since we have different amount of params
+void main();
+
+void main() {
+	double l;
+	double z[100];
+	if (9==9) {
+		myfirstlabel: for (;;) {
+			break myfirstlabel;
+		} 
+	} else;
+}
+

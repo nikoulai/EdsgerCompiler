@@ -1,0 +1,15 @@
+void main () {
+     bool i[10];
+     i[2] = true;
+}
+
+void ifun () {
+     int  j[10];
+     int *i;
+     i = j;
+}
+
+void sfun () {
+     char *s;
+     s = "test";
+}

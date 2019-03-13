@@ -1,0 +1,14 @@
+#include "stdio.h"
+void writeBoolean(bool c);
+void writeString(char * xx);
+void main () {
+	bool b;
+	b = (bool)'q';
+	if (b && !((bool)0)) {
+//		writeString("PASS");
+		writeBoolean(true);
+	} else {
+//		writeString("FAIL");
+		writeBoolean(false);
+	}
+}

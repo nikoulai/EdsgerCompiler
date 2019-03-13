@@ -1,0 +1,27 @@
+void main() {
+    int x;    
+    int j;
+    j = x++;
+    j = ++x;
+    x+=1;
+    x=x+1;
+}
+void ptr() {
+    int *x;
+    int *j;
+    j = x++;
+    j = ++x;
+    x+=1;
+    x=x+1;
+}
+
+void dbl() {
+    double x;
+    double y;
+    
+    y = x++;
+    y = ++x;
+    x+=1.0;
+    x=x+1.0;
+}
+

@@ -1,0 +1,60 @@
+// This is my First Program
+int y;
+bool y, k, delta;
+double z[100];
+void main ();
+int*** second();
+double another(int k, double z, byref int coolz);
+
+
+/* A
+Function definition follows, since functions are COOL
+if you agree, clap your hands buddy
+*/
+
+int myfun() {
+	;;;
+}
+
+//Okay lets define one more function 
+
+void new_fun(int arg1, byref int arg2, byref char test) {
+	int nested_fun () {
+		int z;
+		y /= 80;	
+		z %= 800;
+		k = '\xff';
+		k = '\x00';
+		k = '\x05';
+		k = '\x0f';
+		k = '\xf0';
+		s = 'a';
+		u = '\n';
+		u = '\\';
+		u = '\'';
+		u = '\"';
+		u = '\t';
+		u = '\r';
+		if ( x==0 || z==0 || r+9==15 ) 
+			z=0;
+		else; 
+	}
+}
+
+bool yetanotherfun() {
+	for ( i=0 ; i<0 ; i++ ) ;		
+Test: for ( i=19 ; i<19 && j>30 ; k++ ) {
+		for ( j=500; j<500 ; j+=3) {
+			sum /= 2;	
+			if (z==0)  { 
+				z=-9;
+				break Test;
+			} else if (k==0) {
+				z=+3;	
+				z=&k;
+				z=!9;
+				break Test;
+			}
+		}
+	}
+}

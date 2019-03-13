@@ -1,0 +1,7 @@
+void test(int a) {
+    return;
+}
+void main() {
+    test(8.5);
+    test();
+}

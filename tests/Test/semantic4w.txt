@@ -1,0 +1,10 @@
+int j;
+
+int anotherfunction(int c);
+
+char new_fun (char x, char y);
+
+int anotherfunction(char c) {
+}
+
+

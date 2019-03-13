@@ -1,0 +1,21 @@
+int j;
+char k[1000];
+char **z[390+250];
+double lol[1990+500*250/2];
+
+int test() {
+	int mem(char x,double z) {
+		that:for (;;);
+		for (;;) break that;
+	}
+
+	if (9==3) {
+		;;	
+	}	
+	for (j=0; j<= 1000; j++) {
+		;;;	
+	}
+}
+
+
+

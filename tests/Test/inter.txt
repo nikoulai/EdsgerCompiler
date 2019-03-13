@@ -1,0 +1,42 @@
+void main () {
+    9+((5%(9/15))*9)-2;
+}
+void test() {
+    void nested() {
+        100*100; 
+    } 
+    if ( false < false) 
+    {
+        7*7;
+    }
+    else{
+        8*8; 
+    }
+    //100*100;
+}
+void test_neg() {
+    if (! (false < false)) 
+    {
+        7*7;
+    }
+    else{
+        8*8; 
+    }
+}
+void test_neg2() {
+    if ((false >= false)) 
+    {
+        7*7;
+    }
+    else{
+        8*8; 
+    }
+}
+
+void testfor () {
+    int i;
+    tlabel:for (i=0; i<100;i = i+1) {
+        100+i; 
+    }
+}
+

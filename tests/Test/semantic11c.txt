@@ -1,0 +1,8 @@
+void main() {
+	int i;
+  int j[(int)5.1];
+  int j[(int)(5.1+9.2)];
+	for (i=0; i<100; i++) {
+		i += 1;
+	}
+}

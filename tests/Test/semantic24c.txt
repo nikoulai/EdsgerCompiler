@@ -1,0 +1,6 @@
+void main() {
+    int **c;
+    int *j;
+    c[2]= j;
+    c[2][3]= 9;
+}

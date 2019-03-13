@@ -1,0 +1,133 @@
+#include "stdio.h"
+
+void main() {
+	int i, choice, cast;
+	double d;
+	char c;
+	bool b;
+
+	prog: for (;;) {
+		writeString("\nThis program checks basic typecasting\n");
+		for (;;) {
+			writeString("You should choose type1, give one value and then choose type2 for your casting type1 -> type2\n");
+			writeString("Press 1 to exit\n      2 for integer\n      3 for double\n      4 for char\n      5 for boolean\n");
+			choice = readInteger();
+			if (choice == 1) {
+				break prog;
+			}
+			else if (choice == 2) {
+				writeString("Give integer value: ");
+				i = readInteger();
+				writeString("Integer value is: ");
+				writeInteger(i);
+				writeChar('\n');
+				break;
+			}
+			else if (choice == 3) {
+				writeString("Give double value: ");
+				d = readReal();
+				writeString("Double value is: ");
+				writeReal(d);
+				writeChar('\n');
+				break;
+			}
+			else if (choice == 4) {
+				writeString("Give char value: ");
+				c = readChar();
+				writeString("Char is: ");
+				writeChar(c);
+				writeChar('\n');
+				break;
+			}
+			else if (choice == 5) {
+				writeString("Give boolean value: ");
+				b = readBoolean();
+				writeString("Boolean value is: ");
+				writeBoolean(b);
+				writeChar('\n');
+				break;
+			}
+		}
+
+		for (;;) {
+			writeString("Now choose type2 for your casting type1 -> type2\n");
+			writeString("Press 1 to exit\n      2 for integer\n      3 for double\n      4 for char\n      5 for boolean\n");
+			cast = readInteger();
+			if (cast ==  1) {
+				break prog;
+			}
+			else if (cast == 2) {
+				writeString("Integer value: ");
+				if (choice == 2) {
+					writeInteger((int) i);
+				}
+				else if (choice == 3) {
+					writeInteger((int) d);
+				}
+				else if (choice == 4) {
+					writeInteger((int) c);
+				}
+				else if (choice == 5) {
+					writeInteger((int) b);
+				}
+				writeChar('\n');
+				break;
+			}
+			else if (cast == 3) {
+				writeString("Double value: ");
+				if (choice == 2) {
+					writeReal((double) i);
+				}
+				else if (choice == 3) {
+					writeReal((double) d);
+				}
+				else if (choice == 4) {
+					writeReal((double) c);
+				}
+				else if (choice == 5) {
+					writeReal((double) b);
+				}
+				writeChar('\n');
+				break;
+			}
+			else if (cast == 4) {
+				writeString("Char value: ");
+				if (choice == 2) {
+					writeChar((char) i);
+				}
+				else if (choice == 3) {
+					writeChar((char) d);
+				}
+				else if (choice == 4) {
+					writeChar((char) c);
+				}
+				else if (choice == 5) {
+					writeChar((char) b);
+				}
+				writeChar('\n');
+				break;
+			}
+			else if (cast == 5) {
+				writeString("Boolean value: ");
+				if (choice == 2) {
+					writeBoolean((bool) i);
+				}
+				else if (choice == 3) {
+					writeBoolean((bool) d);
+				}
+				else if (choice == 4) {
+					writeBoolean((bool) c);
+				}
+				else if (choice == 5) {
+					writeBoolean((bool) b);
+				}
+				writeChar('\n');
+				break;
+			}
+		}
+
+	}
+
+	writeString("Bye\n");
+
+}
