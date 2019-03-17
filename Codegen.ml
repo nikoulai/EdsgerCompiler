@@ -65,19 +65,19 @@ open Format
         let builder =builder_at (instr_begin (entry_block func)) in
         build_alloca (var_type ) var_name builder
 
-        (* | Tproc -> ltype_of_type Tvoid *)
+        (* | Tproc -> type_to_lltype Tvoid *)
 let default_val_type smth = match smth with
-        | Tint ->  const_int (ltype_of_type smth) 0
-        | Tbool -> cont_int (ltype_of_type smth) 0
-        | Tchar -> cont_int (ltype_of_type smth) 0
-        | Tdouble -> const_float (ltype_of_type smth) 0.0
-        | Tvoid -> const_int (ltype_of_type smth) 0
+        | Tint ->  const_int (type_to_lltype smth) 0
+        | Tbool -> cont_int (type_to_lltype smth) 0
+        | Tchar -> cont_int (type_to_lltype smth) 0
+        | Tdouble -> const_float (type_to_lltype smth) 0.0
+        | Tvoid -> const_int (type_to_lltype smth) 0
 let rec codegen_stmt stmt builder= match stmt with
         SExpr (Some a) ->  codegen_expr a
         (* |SNewblock a -> List.map (codegen_stmt builder) a *)
         |Sfor (a,b,c,d,e) -> codegen_for_loop a b c d e builder
         |Sif (a,b,c) -> let fanc = let lval =  codegen_expr a builder in
-        let cond_val = build_fcmp Fcmp.One lval (const_float (ltype_of_type TYPE_double) 0.0) "ifcond" builder in
+        let cond_val = build_fcmp Fcmp.One lval (const_float (type_to_lltype Tdouble) 0.0) "ifcond" builder in
         let start_bb = insertion_block builder in
         let the_function =block_parent start_bb in
         let then_bb =append_block context "then" the_function in
@@ -108,27 +108,27 @@ let rec codegen_stmt stmt builder= match stmt with
 (* and codegen_for_loop *)
 (* and let rec codegen_expr builder= match expr with
         |Eid a ->let v= try Hashtbl.find named_values a with |Not_found -> raise (Error "uknown variable name") in build_load v name builder
-        |Ebool a -> const_int (ltype_of_type Tbool) (if a then 1 else 0)
+        |Ebool a -> const_int (type_to_lltype Tbool) (if a then 1 else 0)
         |Enull -> (*NOP *)
-        |Eint a -> const_int (ltype_of_type Tint) a
-        |Echar a -> const_int (ltype_of_type Tchar) (Char.to_int a)
-        |Edoub a -> const_float (ltype_of_type Tdouble) a
+        |Eint a -> const_int (type_to_lltype Tint) a
+        |Echar a -> const_int (type_to_lltype Tchar) (Char.to_int a)
+        |Edoub a -> const_float (type_to_lltype Tdouble) a
         |Estr a-> build_global_stringptr s "tmp" builder
 and let rec codegen_expr builder= match expr with
         |Eid a ->let v= try Hashtbl.find named_values a with |Not_found -> raise (Error "uknown variable name") in build_load v name builder
-        |Ebool a -> const_int (ltype_of_type Tbool) (if a then 1 else 0)
+        |Ebool a -> const_int (type_to_lltype Tbool) (if a then 1 else 0)
         |Enull -> (*NOP *)
-        |Eint a -> const_int (ltype_of_type Tint) a
-        |Echar a -> const_int (ltype_of_type Tchar) (Char.to_int a)
-        |Edoub a -> const_float (ltype_of_type Tdouble) a
+        |Eint a -> const_int (type_to_lltype Tint) a
+        |Echar a -> const_int (type_to_lltype Tchar) (Char.to_int a)
+        |Edoub a -> const_float (type_to_lltype Tdouble) a
         |Estr a-> build_global_stringptr s "tmp" builder
         (* |Tuamp a -> *)
         (* |Tutim a->
          |Tupl a-> *)
         |Tumin a -> let lval = codegen_expr a builder in let type_is = (* type get*)
                                 in let type_m m= match m  with
-                                TYPE_int -> build_neg lval "int_unoptmp" builder
-                                | TYPE_double -> build_fneg lval "flt_unotmp" builder
+                                Tint -> build_neg lval "int_unoptmp" builder
+                                | Tdouble -> build_fneg lval "flt_unotmp" builder
                                 in type_m type_is
         |Tbtim (a,b) -> codegen_binary a b Mult builder
         |Tbdiv (a,b) ->codegen_binary a b Div builder
@@ -198,8 +198,8 @@ and let rec codegen_binary e1 e2 expr  builder=
          |Tupl a-> *)
         |Tumin a -> let lval = codegen_expr a builder in let type_is = (* type get*)
                                 in let type_m m= match m  with
-                                TYPE_int -> build_neg lval "int_unoptmp" builder
-                                | TYPE_double -> build_fneg lval "flt_unotmp" builder
+                                Tint -> build_neg lval "int_unoptmp" builder
+                                | Tdouble -> build_fneg lval "flt_unotmp" builder
                                 in type_m type_is
         |Tbtim (a,b) -> codegen_binary a b Mult builder
         |Tbdiv (a,b) ->codegen_binary a b Div builder
@@ -279,10 +279,10 @@ and let rec codegen_binary e1 e2 expr  builder=
         After(ins)-> if ((instr_opcode ins) = Opcode.Ret) then ()
         else
                 if return =(void_type context )  then ignore (build_ret_void); else
-                        ignore(build_ret (default_val_type TYPE_int) builder)
+                        ignore(build_ret (default_val_type Tint) builder)
        |At_start(_) ->
                 if return =(void_type context )  then ignore (build_ret_void); else
-                        ignore(build_ret (default_val_type TYPE_int) builder);; *)
+                        ignore(build_ret (default_val_type Tint) builder);; *)
 
 
 (* let getAdreess expr builder =  match expr with
@@ -294,13 +294,13 @@ and let rec codegen_binary e1 e2 expr  builder=
  |EArray(x,y) -> let index = codegen_expr y builder in  let tmp_val = findinHash x in
  let dereference = build_gep tmp_val  [|0;index|] "arrayval" builder in dereference *)
 
-let rec ltype_of_type = function
+let rec type_to_lltype = function
        | Tint ->  i32_type context
        | Tchar -> i8_type context
        | Tbool -> i1_type context
        | Tdouble -> double_type context
-       | Tptr t -> pointer_type (ltype_of_type t)
-       | Tarray (a,b) -> array_type (ltype_of_type a) b
+       | Tptr t -> pointer_type (type_to_lltype t)
+       | Tarray (a,b) -> array_type (type_to_lltype a) b
        | Tvoid -> void_type context
 
 (*  check if there is main function*)
@@ -319,23 +319,23 @@ and seperate prog =
   print_endline  "  Fundefi ";
 (*
 and codegen_func typ name params =
-          let parametres = List.map (fun x-> ltype_of_type x.parameter_info.parameter_type) (func.function_info.function_paramlist) in
-          let fuction_type = function_type (ltype_of_type func.parameter_info.function_result) (Array.of_list parametres) in
+          let parametres = List.map (fun x-> type_to_lltype x.parameter_info.parameter_type) (func.function_info.function_paramlist) in
+          let fuction_type = function_type (type_to_lltype func.parameter_info.function_result) (Array.of_list parametres) in
           define_function name function_type the_module ;; *)
 
   and codegen_func func =
         let name = String.concat "_" (func.entry_id::!fun_names)  in
         if (Hashtbl.mem functions name) then Hashtbl.find functions name else (
-        let parametres = List.map (fun x-> let y = ltype_of_type (get_parameter_f x.parameter_info).parameter_type
+        let parametres = List.map (fun x-> let y = type_to_lltype (get_parameter_f x.parameter_info).parameter_type
         in
         match ((get_parameter_f x.parameter_info).parameter_mode ) with
         | PASS_BY_REFERENCE -> pointer_type y
         | _ -> y
         ) ((get_fuction_f func.parameter_info).function_paramlist) in
-        let fuction_type = function_type (ltype_of_type (get_fuction_f func.parameter_info).function_result) (Array.of_list parametres) in
+        let fuction_type = function_type (type_to_lltype (get_fuction_f func.parameter_info).function_result) (Array.of_list parametres) in
         let b=  declare_function name fuction_type the_module in
         let _ = Hashtbl.add functions name b in b)
-        and param_type x = (fun y-> let z = ltype_of_type (get_parameter_f y.parameter_info).parameter_type in match ((get_parameter_f y.parameter_info).parameter_mode ) with
+        and param_type x = (fun y-> let z = type_to_lltype (get_parameter_f y.parameter_info).parameter_type in match ((get_parameter_f y.parameter_info).parameter_mode ) with
         | PASS_BY_REFERENCE -> pointer_type z
         | _ -> z) x
 
@@ -357,7 +357,7 @@ and codegen_func typ name params =
      	let env_params_to_passed = List.map (temp_var) env_params in
      	let parameters = if(name = "main") then parameters else parameters@env_params_to_passed in
 	fun_names := name :: !fun_names ;
-        let fun_typ= ltype_of_type (get_fuction_f func.parameter_info).function_result in
+        let fun_typ= type_to_lltype (get_fuction_f func.parameter_info).function_result in
         let ft =function_type fun_typ llpars in
         let f = (if (Option.is_some (lookup_function fn_name the_module) ) then let v=( Option.get (lookup_function fn_name the_module)) in (delete_function v; declare_function fn_name ft the_module  ) else ( declare_function fn_name ft the_module (*codegen_func func*)) )in
         (*let builder = builder_at_end context (entry_block f) in*)
@@ -369,7 +369,7 @@ and codegen_func typ name params =
         (match by_ref with
         | PASS_BY_REFERENCE -> set_value_name n el;ignore(Hashtbl.add named_values n el)
         | _ ->
-                        (set_value_name n el;let g = (build_alloca (ltype_of_type typea)  n builder) in (*let el = build_pointercast el (ltype_of_type typea) "cast" builder in *)  ignore(build_store el g builder) ; ignore(Hashtbl.add named_values n g))) ) (params f)
+                        (set_value_name n el;let g = (build_alloca (type_to_lltype typea)  n builder) in (*let el = build_pointercast el (type_to_lltype typea) "cast" builder in *)  ignore(build_store el g builder) ; ignore(Hashtbl.add named_values n g))) ) (params f)
         in
         (*let _ = if (name="main") then List.iter (fun x-> ignore(codegen_decl x builder)) !global_decls else ()  in*)
         (*check*) let _ =List.map (fun x-> codegen_decl  x builder) (sort_d b) in
@@ -380,15 +380,15 @@ and codegen_func typ name params =
         let next_bb =try List.hd !fun_bbs
                      with Failure ("hd") -> bb in
         let last= match block_end f with After (block) -> block in
-        let return= ltype_of_type (get_fuction_f func.parameter_info).function_result (*return_type (type_of f)*) in
+        let return= type_to_lltype (get_fuction_f func.parameter_info).function_result (*return_type (type_of f)*) in
         let _ =(match (instr_end last) with
                 |After(ins)-> if ((instr_opcode ins) = Opcode.Ret) then ()
         else
-                if (return = (ltype_of_type TYPE_void) )  then ignore (build_ret_void builder) else
-                          ignore(build_ret (default_val_type TYPE_int) builder)
+                if (return = (type_to_lltype Tvoid) )  then ignore (build_ret_void builder) else
+                          ignore(build_ret (default_val_type Tint) builder)
          |At_start(_) ->
-                         if (return= (ltype_of_type TYPE_void) )  then( ignore (build_ret_void builder) )else
-                                  ignore(build_ret (default_val_type TYPE_int) builder) ;) in
+                         if (return= (type_to_lltype Tvoid) )  then( ignore (build_ret_void builder) )else
+                                  ignore(build_ret (default_val_type Tint) builder) ;) in
         let _ =ignore(  delete_from_hash b); in
 		      fun_names := List.tl !fun_names;
                       let _ = Array.iteri (fun i a ->
@@ -522,6 +522,7 @@ and codegen_func typ name params =
 
   (* HAVE TO CHANGE IT TO UNIT *)
   let rec codegen_main prog =
+    let _ = codegen_lib() in
     match prog with
     | Some decs -> let decs = sort_decls decs in codegen_declars decs
     | None -> codegen_declars []
@@ -660,9 +661,9 @@ and codegen_func typ name params =
                       (* Printf.printf "Adding by_ref param %s\n" name; *)
                       let _ = set_value_name name a in
                       Hashtbl.add named_values name a
-                 (*let _ = match ty with |TYPE_none -> ignore(update_env name !env) | _ ->() in *) (*Add the env_params*)
-                 (* match ty with TYPE_none -> () | _ -> Hashtbl.add named_values name a) *)
-                 (*TYPE_none == env_variable already added. We don't want dubplicates*)
+                 (*let _ = match ty with |Tnone -> ignore(update_env name !env) | _ ->() in *) (*Add the env_params*)
+                 (* match ty with Tnone -> () | _ -> Hashtbl.add named_values name a) *)
+                 (*Tnone == env_variable already added. We don't want dubplicates*)
                  )(params the_fun)in
        let _ = if(name = "main") then ignore(codegen_declars !global_decs) else ()in
        let decls = sort_decls decls in
@@ -939,3 +940,33 @@ and codegen_func typ name params =
                             (* dump_value lltype; *) lltype)
                        (* |_ -> raise (Tnone "problem with value allocation") *)
                        )
+ and codegen_lib () =
+                 let _ = Hashtbl.add named_values ("writeString")  (declare_function "writeString" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tptr Tchar)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("writeInteger")  (declare_function "writeInteger" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tint)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("writeBoolean")  (declare_function "writeBoolean" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tbool)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("writeChar")  (declare_function "writeChar" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tchar)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("writeReal")  (declare_function "writeReal" (function_type (type_to_lltype Tvoid) [|x86fp80_type context|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("readInteger")  (declare_function "readInteger" (function_type (type_to_lltype Tint) [||]) the_module ) in
+                 let _ = Hashtbl.add named_values ("readBoolean")  (declare_function "readBoolean" (function_type (type_to_lltype Tbool) [||]) the_module ) in
+                 let _ = Hashtbl.add named_values ("readChar")  (declare_function "readChar" (function_type (type_to_lltype Tchar) [||]) the_module ) in
+                 let _ = Hashtbl.add named_values ("readReal")  (declare_function "readReal" (function_type (type_to_lltype Tdouble) [||]) the_module ) in
+                 let _ = Hashtbl.add named_values ("readString")  (declare_function "readString" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tint ; type_to_lltype (Tptr Tchar)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("abs")  (declare_function "abs" (function_type (type_to_lltype Tint) [|type_to_lltype Tint |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("fabs")  (declare_function "fabs" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("sqrt")  (declare_function "sqrt" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("sin")  (declare_function "sin" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("cos")  (declare_function "cos" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("tan")  (declare_function "tan" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("atan")  (declare_function "atan" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("exp")  (declare_function "exp" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("ln")  (declare_function "ln" (function_type (type_to_lltype Tdouble) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("pi")  (declare_function "pi" (function_type (type_to_lltype Tdouble) [| |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("trunc")  (declare_function "trunc" (function_type (type_to_lltype Tint) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("round")  (declare_function "round" (function_type (type_to_lltype Tint) [|type_to_lltype Tdouble |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("ord")  (declare_function "ord" (function_type (type_to_lltype Tint) [|type_to_lltype Tchar |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("chr")  (declare_function "chr" (function_type (type_to_lltype Tchar) [|type_to_lltype Tint |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("strlen")  (declare_function "strlen" (function_type (type_to_lltype Tint) [|type_to_lltype (Tptr Tchar) |]) the_module ) in
+                 let _ = Hashtbl.add named_values ("strcmp")  (declare_function "strcmp" (function_type (type_to_lltype Tint) [|type_to_lltype (Tptr Tchar) ; type_to_lltype (Tptr Tchar)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("strcpy")  (declare_function "strcpy" (function_type (type_to_lltype Tvoid) [|type_to_lltype (Tptr Tchar) ; type_to_lltype (Tptr Tchar)|]) the_module ) in
+                 let _ = Hashtbl.add named_values ("strcat")  (declare_function "strcat" (function_type (type_to_lltype Tvoid) [|type_to_lltype (Tptr Tchar) ; type_to_lltype (Tptr Tchar)|]) the_module ) in
+                 ();;

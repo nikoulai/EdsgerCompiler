@@ -5,9 +5,8 @@ Implementation of compiler for Edsger programming language in OCaml, using ocaml
 Compile:    make depend
             make all
 
-            ocamlbuild  Main.byte
 
-
+            ocamlbuild   -r -use-ocamlfind Main.byte -package llvm -pkgs str
 Authors:
 Nikos Iliakis
 Aspa Skalidi

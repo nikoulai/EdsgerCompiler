@@ -44,8 +44,12 @@ rule e_lang = parse
 | digit+ '.' digit+ (('e'|'E') ('+'|'-')? (digit+))? as fnum
 { DOUBLE_NUM (float_of_string fnum) }
 
-| '\'' (("\\n"|"\\t"|"\\r"|"\\0" | "\\\\" |"\\\'"|"\\\"" | ("\\x" hex_d hex_d)) | [^ '"' '\\' ''']) '\'' as char
-{ CHAR_V char }
+| '\'' '\\' ('n' | 't' | 'r' | '0'| '\'' | '\"' |('x' (digit|['A'-'F' 'a'-'f']) (digit|['A'-'F' 'a'-'f'])) | '\\') '\'' as character
+           		    { let c = Str.global_replace (Str.regexp "\\\\n") "\n" character in
+	 		      let c = Str.global_replace (Str.regexp "\\\\t") "\t" c in
+	 		      let c = Str.global_replace (Str.regexp "\\\\r") "\r" c in
+		      	CHAR_V(c.[1])
+                      }
 
 | '"' (("\\n"|"\\t"|"\\r"|"\\0" | "\\\\" |"\\\'"|"\\\"" | ("\\x" hex_d hex_d)) | [^ ''' '"' '\\'])* '"' as string
 { STRING string }

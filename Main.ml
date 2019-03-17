@@ -3,6 +3,7 @@ open Format
 open Ast
 open Semantic
 open Codegen
+open Llvm
 
 let main =
   let chan =
@@ -14,9 +15,10 @@ let main =
     let lexbuf = Lexing.from_channel chan in
     (try
       Parser.start Lexer.e_lang lexbuf;
-      (* print_ast !ast_tree; *)
+      print_ast !ast_tree;
       check_program !ast_tree;
-      Codegen.codegen_main !ast_tree;
+      let a=    Codegen.codegen_main !ast_tree
+        in print_module ("llvm_code.ll") Codegen.the_module;
       (*infer !ast_tree;*)
       exit 0
     with
