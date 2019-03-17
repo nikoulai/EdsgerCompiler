@@ -9,7 +9,7 @@ open Str
 open Error
 
 exception Terminate
-exception Terror of string 
+exception Terror of string
  let rec printType x= match x with
 | Tarray _ -> Printf.printf "This is array\n";()
 | Tdouble -> Printf.printf "This is dobule\n";()
@@ -42,50 +42,50 @@ let rec  getType expr = match expr with
           | Tuamp -> Tptr (getType x)
           | _ -> getType x
           )
-        | Eunas (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with 
+        | Eunas (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with
           |Tptr a -> Tptr a
           |_->  (error "++ -- needs integer"; Tnone) )
         | Ebop (x,y,z) -> (match z with
-          | Tbmod -> (match (getType x,getType y) with 
-            | (Tint,Tint) ->  Tint 
-            | (Tptr (Tint),Tint) -> Tint 
-            | (Tint ,Tptr (Tint)) -> Tint 
-            | (Tptr (Tint) ,Tptr (Tint)) -> Tint 
+          | Tbmod -> (match (getType x,getType y) with
+            | (Tint,Tint) ->  Tint
+            | (Tptr (Tint),Tint) -> Tint
+            | (Tint ,Tptr (Tint)) -> Tint
+            | (Tptr (Tint) ,Tptr (Tint)) -> Tint
             | _ -> (*Types.printType (getType x);Types.printType (getType y);*)error "Mod needs integer and integer" ; Tnone
             )
-          | Tblss | Tbgrt | Tbleq | Tbgeq | Tbeq | Tbneq -> (match (getType x,getType y) with 
+          | Tblss | Tbgrt | Tbleq | Tbgeq | Tbeq | Tbneq -> (match (getType x,getType y) with
             | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool)  -> Tbool
-            | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c1" ;Tnone)  
-            | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c1" ;Tnone)  
-            | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c1" ;Tnone)  
+            | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c1" ;Tnone)
+            | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c1" ;Tnone)
+            | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c1" ;Tnone)
             | _ ->error "sigkrisi xriazete arithmous";Tnone)
           | Tband | Tbor -> (match (getType x,getType y) with
-            | (Tbool ,Tbool) ->Tbool 
+            | (Tbool ,Tbool) ->Tbool
             | _ -> printType (getType x); printType (getType y);error "type missimatch on boolean action" ; Tnone )
           | Tbcom -> getType y
           | _ -> (match (getType x,getType y) with | (Tptr x1,Tint) -> Tptr x1
             | (Tint,x1) -> x1
             | (x1,Tint) ->x1
             | (Tdouble,x1) ->Tdouble
-            | (x1,Tdouble) ->Tdouble 
-            | (Tchar,x1) ->Tchar 
-            | (x1,Tchar) ->Tchar 
+            | (x1,Tdouble) ->Tdouble
+            | (Tchar,x1) ->Tchar
+            | (x1,Tchar) ->Tchar
             | _ -> error "Type problem";Tnone (*I shall add something for char + char etc*)
             )
           )
         | Ebas (x,y,z) -> (match z with
-          | Tbamod -> (match (getType x,getType y) with 
-                | (Tint,Tint) ->  Tint 
-                | (Tptr (Tint),Tint) -> Tint 
-                | (Tint ,Tptr (Tint)) -> Tint 
-                | (Tptr (Tint) ,Tptr (Tint)) -> Tint 
+          | Tbamod -> (match (getType x,getType y) with
+                | (Tint,Tint) ->  Tint
+                | (Tptr (Tint),Tint) -> Tint
+                | (Tint ,Tptr (Tint)) -> Tint
+                | (Tptr (Tint) ,Tptr (Tint)) -> Tint
                 | _ -> (*Types.printType (getType x);Types.printType (getType y);*)error "Mod needs integer and integer" ; Tnone
                 )
-          | _ -> (match (getType x,getType y) with 
+          | _ -> (match (getType x,getType y) with
             | (Tptr x1,Tint) -> Tptr x1
             | (x,_) -> x (*need to check later*)
             | _ ->error "Tproblem";Tnone (*I shall add something for char + char etc*)
-            ) 
+            )
           )
         | Ecast (x,y) -> if castAllow x (getType y) then x else getType y
         | Eif (x,y,z)-> if (getType x = Tbool) then (if equalType (getType y) (getType z) then getType y else (error "question type1"; Tnone )) else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
@@ -94,7 +94,7 @@ let rec  getType expr = match expr with
         | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)
         | Eapp (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result
         | _ -> Tnone
-and  castAllow x y = match (x,  y) with 
+and  castAllow x y = match (x,  y) with
 | (Tdouble ,Tint)| (Tint,Tdouble) -> true
 | (Tbool ,_) -> true
 | (Tchar ,Tint) -> true
@@ -109,20 +109,20 @@ and check_name_lib name = match name with
 |"writeString" | "writeInteger" |"writeBoolean" | "writeChar" | "writeReal" | "readInteger" | "readBoolean" | "readChar" | "readReal" | "readString" | "abs" | "fabs" | "sqrt" |"sin" | "cos" | "tan" | "atan" | "exp" | "ln" |"pi" | "trunc" | "round" | "ord"|"chr" | "strlen" | "strcmp"|"strcpy" | "strcat"->true
 | _ -> false
 and get_name_lib name = match name with
-        |"writeString"  | "writeInteger" |"writeBoolean" | "writeChar" | "writeReal" -> Tvoid 
+        |"writeString"  | "writeInteger" |"writeBoolean" | "writeChar" | "writeReal" -> Tvoid
         | "readInteger" -> Tint
-        | "readBoolean" -> Tbool 
-        | "readChar"->Tchar 
-        | "readReal" -> Tdouble 
+        | "readBoolean" -> Tbool
+        | "readChar"->Tchar
+        | "readReal" -> Tdouble
         | "readString"->Tptr (Tchar)
          | "abs" -> Tint
          | "fabs" | "sqrt" |"sin" | "cos" | "tan" | "atan" | "exp" | "ln" |"pi" -> Tdouble
          | "trunc" | "round" -> Tint
          | "ord" -> Tint
-         |"chr"-> Tchar 
+         |"chr"-> Tchar
          | "strlen" ->Tint
          | "strcmp" ->Tbool
-         |"strcpy"->Tvoid 
+         |"strcpy"->Tvoid
          | "strcat"->Tvoid;;
 (* to compile with Str we use str.cma in ocaml *)
 
@@ -159,14 +159,14 @@ and check_declaration t = match t with
      (* let _  = Printf.printf "adding %s\n" fun_name in *)
      let t = ( Symbol.newFunction (id_make fun_name) true) in (* t is fun entry (ty, t)=a, params *)
      ignore(openScope(ty));
-     ignore(List.map (registerParams t) params);  
+     ignore(List.map (registerParams t) params);
      ignore(endFunctionHeader t (ty));
      check_declarations decls;
      (try check_statements stms with Terror _ -> raise (Terror ""));
      if (equalType (!currentScope.sco_type) (Tvoid)) && not ( !find_return) then (  find_return := false)
      else if( !find_return) then ( find_return := false;)  else Error.error "Couldn't find return in non void function" ;
      closeScope()
-     
+
 
 and check_declarators ty decs = match decs with
   | [] -> ()
@@ -179,9 +179,9 @@ and check_declarator ty dec = match dec with
   | Decl (name, maybe_expr) ->
     (match maybe_expr with
        | None ->
-         ignore (newVariable (id_make name) ( ty) true);       
+         ignore (newVariable (id_make name) ( ty) true);
        | Some exp ->
-         if (equalType (getType exp) Tint) then 
+         if (equalType (getType exp) Tint) then
           ignore (newVariable (id_make name) (Tarray(ty,0)) true) (*we don't care for the size just typechecking... *)
          else Printf.printf "Error in array declaration"
     )
@@ -189,7 +189,7 @@ and check_declarator ty dec = match dec with
 (*  t is the function entry aka t in our case *)
 and registerParams t param  = match param with
   | Param (typ, name)->
-     ignore (newParameter (id_make name) (typ) PASS_BY_VALUE t true)          
+     ignore (newParameter (id_make name) (typ) PASS_BY_VALUE t true)
   | ParamByRef (typ, name)->
      ignore (newParameter (id_make name) (typ) PASS_BY_REFERENCE t true)
 
@@ -200,7 +200,7 @@ and check_statements stms = match stms with
      let _ = try check_statement stm with Terror _ -> Printf.printf "\nThe Error was found here:\n"; printf "%a\n" print_ast_stmt stm; raise (Terror "") in
      check_statements rest;
 
-and check_statement stm = 
+and check_statement stm =
   match stm with
 (*  | Sexpr None -> ()*)
 (*  | Sexpr Some exp -> ignore (getType exp)*)
@@ -228,7 +228,7 @@ and check_statement stm =
    );
    for_loop:= !for_loop +1;
    check_statement s;
-   for_loop:= !for_loop - 1;                
+   for_loop:= !for_loop - 1;
 | Scont i | Sbrk i ->
    (* check_loop s1; (\* checks if we are in a loop *\) *)
    if (!for_loop == 0) then Error.error "Break or continue not inside a loop" else ()
@@ -242,7 +242,7 @@ and check_statement stm =
        ignore (check_fun_type (!currentScope.sco_type) (getType expr)));
 (* ignore(Symbtest.printSymbolTable());    *)
 
-and check_fun_type scope_typ typ = 
+and check_fun_type scope_typ typ =
   if (equalType scope_typ typ) then
     find_return := true
   else
@@ -251,7 +251,7 @@ and check_fun_type scope_typ typ =
       (printType typ);
       raise Terminate )
 
-and check_main () = 
+and check_main () =
   let main = lookupEntry (id_make "main") LOOKUP_CURRENT_SCOPE true in  (*look for main_ if you want tou support functions with same name ;) *)
   match main.entry_info with
   | ENTRY_function _ -> ()
@@ -259,6 +259,6 @@ and check_main () =
 
 (* Or simply add new function main and try to catch an exception? *)
 
-(*and add_suffix param_list = 
-  let suffix = List.map (fun x -> match x with | Param (t,_) -> convert_tto_char t | ParamByRef (t,_) -> convert_tto_char t) param_list in String.concat "" suffix 
+(*and add_suffix param_list =
+  let suffix = List.map (fun x -> match x with | Param (t,_) -> convert_tto_char t | ParamByRef (t,_) -> convert_tto_char t) param_list in String.concat "" suffix
 *)
