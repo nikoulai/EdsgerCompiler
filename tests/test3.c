@@ -22,7 +22,11 @@ void main ()
 		return true;
 	}
 
+    {
+        writeString("Please, give the upper limit: ");
+    }
 	writeString("Please, give the upper limit: ");
+    {}
 	limit = readInteger();
 	writeString("Prime numbers between 0 and ");
 	writeInteger(limit);

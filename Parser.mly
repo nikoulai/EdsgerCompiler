@@ -33,7 +33,7 @@ open Lexing
 %token TRUE
 %token VOID
 %token <string> IDENT
-%token <string> CHAR_V
+%token <char> CHAR_V
 %token CHAR
 %token <string> STRING
 %token ASSIGN
@@ -70,7 +70,7 @@ open Lexing
 %token LCBRACK
 %token RCBRACK
 %token INCLUDE
-%token EOF 
+%token EOF
 //%token PLUS MINUS MULTIPLY DIVIDE CARET
 %token <string> VAR
 %token <float->float> FNCT
@@ -92,9 +92,9 @@ open Lexing
 %nonassoc OPOP /*Na to ksanadoume ayto*/
 /*DANGLING IF */
 %nonassoc LOWER_THAN_ELSE
-%nonassoc ELSE 
+%nonassoc ELSE
 /* ------------*/
-%left COMMA 
+%left COMMA
 %nonassoc TtypeaS /*for typea_t shift/reduce conflict */
 
 %right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
@@ -103,8 +103,8 @@ open Lexing
 %left OR
 %left AND LESS GREATER EQUAL N_EQUAL LESS_EQ GREAT_EQ
 %right ASSIGNMENT
-%left OPERATOR /* all binary_operators for shift/reduce*/ 
-%left PLUS MINUS       
+%left OPERATOR /* all binary_operators for shift/reduce*/
+%left PLUS MINUS
 %left TIMES DIV MOD
 %nonassoc CASTING /*bonus*/
 %nonassoc PPLUS MMINUS
@@ -137,14 +137,14 @@ open Lexing
 %type <ast_stmt list> statements
 %type <string> op_ident
 %type <string> op_ident_colon
-%type <ast_expr option> op_exp 
+%type <ast_expr option> op_exp
 %type <ast_expr> expression
 %type <ast_expr> op_brack_exp
 %type <ast_expr list> expression_list
 %type <ast_expr list> op_exp_list
 %type <ast_expr> constant_exp
 %type <ast_unop> unary_op
-%type <ast_unas> unary_assignment 
+%type <ast_unas> unary_assignment
 %type <ast_bop> binary_op
 %type <ast_bas> binary_assignment
 
@@ -162,13 +162,13 @@ includes: /* empty */ { () }
 includ: INCLUDE STRING { () }
 ;
 
-program : declaration { [$1]} 
-| program declaration { $1 @ [$2] }  
+program : declaration { [$1]}
+| program declaration { $1 @ [$2] }
 ;
 
 declaration : var_declaration { $1 }
-| func_declaration { $1 } 
-| func_definition { $1 } 
+| func_declaration { $1 }
+| func_definition { $1 }
 ;
 
 var_declaration : typea declarators SEMICOLON { Vardecl ($1, $2) }
@@ -177,7 +177,7 @@ var_declaration : typea declarators SEMICOLON { Vardecl ($1, $2) }
 declarators: declarator { [$1] }
 | declarators COMMA declarator { $1 @ [$3] }
 ;
-	
+
 typea: b_typea { $1 }
 | typea TIMES %prec TtypeaS { Tptr $1 }
 ;
@@ -188,7 +188,7 @@ typea: b_typea { $1 }
 
 b_typea: INT { Tint }
 | DOUBLE { Tdouble }
-| BOOL { Tbool } 
+| BOOL { Tbool }
 | CHAR { Tchar }
 | VOID {Tvoid}
 ;
@@ -209,13 +209,13 @@ parameter_list:
 	parameter parameters { $1 :: $2 }
 ;
 
-parameters : 
+parameters :
 	/*empty*/ { [] }
 	| COMMA parameter parameters { $2 :: $3 }
 ;
 
 parameter :
-	BYREF typea IDENT { ParamByRef ($2, $3) } 
+	BYREF typea IDENT { ParamByRef ($2, $3) }
 	| typea IDENT { Param ($1, $2) }
 
 /*
@@ -256,11 +256,14 @@ statement : SEMICOLON { Snull }
 	      | LCBRACK statements RCBRACK { Slist $2 }
 	      | IF LPAREN expression RPAREN statement %prec LOWER_THAN_ELSE { Sif ($3, $5, None) }
 	      | IF LPAREN expression RPAREN statement ELSE statement { Sif ($3, $5, Some $7) }
-     	  | op_ident_colon FOR LPAREN  op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement { Sfor ($1, $4, $6, $8,$10) }
-	      | CONTINUE  op_ident SEMICOLON { Scont $2 }
-	      | BREAK op_ident SEMICOLON { Sbrk $2 }
+     	  | op_ident_colon FOR LPAREN  op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement { Sfor (Some $1, $4, $6, $8,$10) }
+				| FOR LPAREN  op_exp SEMICOLON op_exp SEMICOLON op_exp RPAREN statement { Sfor (None, $3, $5, $7,$9) }
+				| CONTINUE   SEMICOLON { Scont None }
+				| CONTINUE  op_ident SEMICOLON { Scont (Some $2) }
+				| BREAK SEMICOLON { Sbrk None }
+	      | BREAK op_ident SEMICOLON { Sbrk (Some $2) }
 	      | RETURN op_exp SEMICOLON { Sreturn $2}
-;			
+;
 
 expression : IDENT { Eid $1 }
 | LPAREN expression RPAREN { $2 }
@@ -275,7 +278,8 @@ expression : IDENT { Eid $1 }
 | unary_op expression %prec UNOP { Eunop ($2, $1) }
 | unary_assignment expression %prec PREFIX { Eunas ($2, $1) }
 | LPAREN typea RPAREN expression %prec CASTING  { Ecast ($2, $4) }
-| NEW typea op_brack_exp { Enew ($2, $3) }
+| NEW typea op_brack_exp { Enew ($2,Some $3) }
+| NEW typea SEMICOLON { Enew ($2, None) }
 | DELETE expression { Edel $2 }
 /*| DELETE expression %prec UMINUS {}*/
 | expression LBRACK expression RBRACK %prec POSTFIX { Emat($1, $3) }
@@ -307,7 +311,7 @@ unary_op :
       | PLUS { Tupl }
       | MINUS { Tumin }
       | NOT { Tunot }
-;	
+;
 
 
 binary_op :
@@ -318,7 +322,7 @@ TIMES { Tbtim }
 | MINUS { Tbmin }
 | LESS { Tblss }
 | GREATER { Tbgrt }
-| LESS_EQ { Tbleq }            
+| LESS_EQ { Tbleq }
 | GREAT_EQ { Tbgeq }
 | EQUAL { Tbeq }
 | N_EQUAL { Tbneq }

@@ -38,7 +38,7 @@ rule e_lang = parse
 | id as ident { IDENT ident }
 
 
-| digit+ as inum 
+| digit+ as inum
 { INT_NUM (int_of_string inum) }
 
 | digit+ '.' digit+ (('e'|'E') ('+'|'-')? (digit+))? as fnum
@@ -74,7 +74,7 @@ rule e_lang = parse
 | '?'  {Q_MARK}
 | ':'  {COLON}
 | ','  {COMMA}
-| "==" {EQUAL} 
+| "==" {EQUAL}
 | "!=" {N_EQUAL}
 | ">=" {GREAT_EQ}
 | "<=" {LESS_EQ}
@@ -86,12 +86,12 @@ rule e_lang = parse
 | "-=" {ASSIGN_MINUS}
 | "*=" {ASSIGN_TIMES}
 | "/=" {ASSIGN_DIV}
-| "%=" {ASSIGN_MOD} 
+| "%=" {ASSIGN_MOD}
 | ';'  {SEMICOLON}
 | '('  {LPAREN}
-| ')'  {RPAREN}	
+| ')'  {RPAREN}
 | '['  {LBRACK}
-| ']'  {RBRACK}	
+| ']'  {RBRACK}
 | '{'  {LCBRACK}
 | '}'  {RCBRACK}
 
@@ -122,7 +122,7 @@ rule e_lang = parse
 | _ as c
 {
   let pos = lexbuf.Lexing.lex_curr_p in
-  Printf.printf "Invalid Character '%c' at line %d, position %d." 
+  Printf.printf "Invalid Character '%c' at line %d, position %d."
   c pos.pos_lnum (pos.pos_cnum - pos.pos_bol);
   raise Not_found
   }
@@ -130,8 +130,8 @@ rule e_lang = parse
 	Printf.printf "Unrecognized character: %c\n" c;
 }*)
 
-| eof 
-{ 
+| eof
+{
 	Printf.printf "EOF\n";
 	EOF;
 }
@@ -151,7 +151,7 @@ and comment = parse
 }
 
 | eof
-{ 
+{
 	Printf.printf "comments are not closed";
 	raise End_of_file
 }
