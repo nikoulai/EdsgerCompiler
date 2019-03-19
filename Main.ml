@@ -20,6 +20,8 @@ let main =
       let a=    Codegen.codegen_main !ast_tree
         in print_module ("llvm_code.ll") Codegen.the_module;
       (*infer !ast_tree;*)
+      let status = Sys.command "llc llvm_code.ll && clang++-6.0 -g llvm_code.s libs/edsger_lib/lib.a -o out " in
+      (* Printf.printf "status = %d\n" status; *)
       exit 0
     with
     | Parsing.Parse_error ->
