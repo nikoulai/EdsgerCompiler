@@ -328,7 +328,6 @@ TIMES { Tbtim }
 | N_EQUAL { Tbneq }
 | AND { Tband }
 | OR { Tbor }
-| COMMA { Tbcom }
 ;
 
 
