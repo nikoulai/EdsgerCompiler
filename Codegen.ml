@@ -717,46 +717,33 @@ and codegen_func typ name params =
     | Ast.Snull -> const_null integer_type
     | Ast.Slist sts -> codegen_states sts
     | Ast.Sif(cond, stm,else_stm) ->(
-       match else_stm with
-       | None ->
-           let condition = code_gen_exp cond in
-         let zero = if (String.contains(string_of_lltype(type_of condition)) '1') then  const_int (i1_type context) 0
-                    else const_int (bool_type) 0 in
-         let cond_val = if (is_pointer cond) then build_load condition "loadcon" builder
-                        else condition in
-         let cond_val = build_icmp Icmp.Ne cond_val zero "ifcond" builder in
-
-
+       (* match else_stm with *)
+       (* | None -> *)
+         let y = code_gen_exp cond in
+         let lval = if(ExpCodeGen.need_def cond) then build_load y "tmp" builder else y in
+         let cond_val = build_icmp Icmp.Ne lval (const_int (i1_type context) 0) "ifcond" builder in
          let start_bb = insertion_block builder in
-         let the_function = block_parent start_bb in
-
-         (* to calculate the llvalue of current block *)
-         let bef_bb = insertion_block builder in
-         let _ = value_of_block bef_bb in
-
-         let then_bb = append_block context "then" the_function in (* we create the then block *)
-         position_at_end then_bb builder; (* we put builder at the end of blovk then_bb *)
-
-         let _ = codegen_statement stm in  (* we create the code for the then statement *)
-         let new_then_bb = insertion_block builder in (* we save the block in new_then_bb *)
-
-         let merge_bb = append_block context "ifcont" the_function in (* we create the block after the if *)
+         let the_function =block_parent start_bb in
+         let then_bb =append_block context "then" the_function in
+         position_at_end then_bb builder;
+         let then_val =codegen_statement stm in
+         let new_then_bb =insertion_block builder in
+         let else_bb = append_block context "else" the_function in
+         position_at_end else_bb builder;
+         let else_val = if ExpCodeGen.is_some else_stm then codegen_statement (ExpCodeGen.get else_stm) else code_gen_exp (Enull) in
+         let new_else_bb =insertion_block builder in
+         let merge_bb= append_block context "ifcond" the_function in
          position_at_end merge_bb builder;
+         let else_bb_v=value_of_block new_else_bb in
+         position_at_end start_bb builder;
 
-         (* let incoming = [(then_val, new_then_bb); (bef_bb_val,bef_bb)] in *)
-         (* let phi = build_phi incoming "iftmp" builder in *)
+         ignore(build_cond_br cond_val then_bb else_bb builder);
+         position_at_end new_then_bb builder; ignore(build_br merge_bb builder);
+         position_at_end new_else_bb builder; ignore(build_br merge_bb builder);
+         position_at_end merge_bb builder ;
+                  else_bb_v)
 
-         position_at_end start_bb builder; (* we return to the starting block *)
-         ignore (build_cond_br cond_val then_bb merge_bb builder); (* we concat the two blocks *)
-
-         position_at_end new_then_bb builder; ignore (build_br merge_bb builder); (* we set the then pointer to the endif block *)
-         position_at_end merge_bb builder; (* we set the builder to the end of common block *)
-         (* phi *)
-         const_null null_type;
-
-
-
-    | Some elsestm ->
+    (*| Some elsestm ->
       let condition = code_gen_exp cond in
 
     let zero = if (String.contains(string_of_lltype(type_of condition)) '1') then  const_int (i1_type context) 0
@@ -799,6 +786,7 @@ and codegen_func typ name params =
     (* phi *)
     const_null null_type;
     )
+    *)
     | Ast.Sfor(tag, e1, e2, e3, s) ->
 
        (* 1 we calculate the first exp *)
