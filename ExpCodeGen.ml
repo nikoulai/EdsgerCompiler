@@ -7,6 +7,9 @@ open Error
 open Char
 
 exception Type_error of string
+exception No_value
+exception Terrror of string*ast_expr
+
 type environment = Global of (string list)| Nested of (string list * environment)
 module SS = Set.Make(String)
 let context = global_context ()
@@ -545,7 +548,9 @@ let rec code_gen_exp exp =
   let ir = code_gen_exp e in
   build_free ir builder
 
-(* |Paren_expression e -> code_gen_exp e *)
+| Enull ->build_add (default_val_type Tint) (default_val_type Tint) "tmp" builder
+
+(* | e ->raise (Terrror ("uknow", e)) *)
 
 and convert_to_typical_types t =
   match t with
