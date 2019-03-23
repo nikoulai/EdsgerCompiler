@@ -89,12 +89,12 @@ open Lexing
 */
 
 /*--------------------------ORDER---------------------------*/
-%nonassoc OPOP /*Na to ksanadoume ayto*/
 /*DANGLING IF */
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE
 /* ------------*/
 %left COMMA
+%nonassoc OPOP 
 %nonassoc TtypeaS /*for typea_t shift/reduce conflict */
 
 %right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
@@ -299,7 +299,7 @@ op_brack_exp : /*empty */ { Eint 1 }
 ;
 
 expression_list : expression %prec OPOP { [$1] }
-| expression_list COMMA expression { $1 @ [$3] }
+| expression_list COMMA expression %prec COMMA{ $1 @ [$3] }
 ;
 
 constant_exp : expression { $1 }
@@ -315,21 +315,21 @@ unary_op :
 
 
 binary_op :
-TIMES { Tbtim }
-| DIV { Tbdiv }
-| MOD { Tbmod }
-| PLUS { Tbpl }
-| MINUS { Tbmin }
-| LESS { Tblss }
-| GREATER { Tbgrt }
-| LESS_EQ { Tbleq }
-| GREAT_EQ { Tbgeq }
-| EQUAL { Tbeq }
-| N_EQUAL { Tbneq }
+TIMES %prec TIMES{ Tbtim }
+| DIV %prec DIV{ Tbdiv }
+| MOD %prec MOD{ Tbmod }
+| PLUS %prec PLUS{ Tbpl }
+| MINUS %prec MINUS{ Tbmin }
+| LESS %prec LESS{ Tblss }
+| GREATER %prec GREATER{ Tbgrt }
+| LESS_EQ %prec LESS_EQ{ Tbleq }
+| GREAT_EQ %prec GREAT_EQ{ Tbgeq }
+| EQUAL %prec EQUAL{ Tbeq }
+| N_EQUAL %prec N_EQUAL{ Tbneq }
 | AND { Tband }
 | OR { Tbor }
+| COMMA %prec COMMA{ Tbcom }
 ;
-
 
 
 unary_assignment :

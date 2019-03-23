@@ -251,8 +251,9 @@ and print_ast_stmt ppf stmt =
 and print_ast_expr ppf ast =
   match ast with
   | Eid name ->
-  fprintf ppf "Eid ";
-    fprintf ppf "%s" name
+  fprintf ppf "Eid ( ";
+    fprintf ppf "%s" name;
+  fprintf ppf " )"
   | Ebool b ->
   fprintf ppf " Ebool";
     fprintf ppf "%b" b
@@ -289,10 +290,11 @@ and print_ast_expr ppf ast =
     print_ast_expr ppf expr;
     print_ast_unas ppf unas;
   | Ebop (expr1, expr2, bop) ->
-  fprintf ppf "Ebop ";
+  fprintf ppf "Ebop ( ";
     print_ast_expr ppf expr1;
     print_ast_bop ppf bop;
     print_ast_expr ppf expr2;
+  fprintf ppf " )";
   | Ebas (expr1, expr2, bas) ->
   fprintf ppf " Ebas";
     print_ast_expr ppf expr1;
@@ -394,7 +396,7 @@ and print_ast_bop ppf ast =
    | Tbgrt ->   fprintf ppf " > ";
    | Tbleq ->   fprintf ppf " <= ";
    | Tbgeq ->   fprintf ppf " >= ";
-   | Tbeq ->   fprintf ppf " = ";
+   | Tbeq ->   fprintf ppf " == ";
    | Tbneq ->   fprintf ppf " != ";
    | Tband ->   fprintf ppf " && ";
    | Tbor ->   fprintf ppf " || ";
