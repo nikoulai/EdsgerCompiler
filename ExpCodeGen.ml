@@ -606,3 +606,81 @@ and is_double_pointer ir =
   let ty = string_of_lltype (type_of ir) in
   if (contains ty "x86") then true
   else false
+and need_def = function
+        | Eid _ -> true
+        | Emat _ ->true
+        (* |(* Eplus (e1,_) | Ediv (e1,_) | Eminus (e1,_) | Emod (e1,_) | Emod (e1,_) | Emult (e1,_) | Eand (e1,_) | Eor (e1,_) | *)(*| EUnAdd e1 |EUnMinus e1 *) EPlusPlus (e1,_) | EMinusMinus (e1,_)  -> false *)
+        |  _->false
+and default_val_type smth = match smth with
+        | Tint ->  const_int (ltype_of_type smth) 0
+        | Tbool -> const_int (ltype_of_type smth) 0
+        | Tchar -> const_int (ltype_of_type smth) 0
+        | Tdouble -> const_float (ltype_of_type smth) 0.0
+        | Tvoid -> const_int (ltype_of_type smth) 0
+and  ltype_of_type = function
+        | Tint ->  i32_type context
+        | Tbool -> i1_type context
+        | Tchar -> i8_type context
+        | Tdouble ->x86fp80_type context (* double_type context *)
+        | Tvoid -> void_type context
+        | Tptr t -> pointer_type (ltype_of_type t)
+        | Tarray (a,b) ->(*pointer_type (ltype_of_type a) *)array_type (ltype_of_type a) b
+        | Tnone -> ltype_of_type Tvoid
+
+
+and may f = function
+
+	| None -> ()
+
+	| Some v -> f v
+
+
+
+and map f = function
+
+	| None -> None
+
+	| Some v -> Some (f v)
+
+
+
+and default v = function
+
+	| None -> v
+
+	| Some v -> v
+
+
+
+and is_some = function
+
+	| None -> false
+
+	| _ -> true
+
+
+
+and is_none = function
+
+	| None -> true
+
+	| _ -> false
+
+
+
+and get = function
+
+	| None -> raise No_value
+
+	| Some v -> v
+
+
+
+and map_default f v = function
+
+	| None -> v
+
+	| Some v2 -> f v2
+
+let get_some = get;;
+let get_some1 = get;;
