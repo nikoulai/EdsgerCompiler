@@ -290,17 +290,7 @@ let rec code_gen_exp exp =
                                | Tbdiv ->  if(is_double ir1) then build_fdiv ir1 ir2 "fdivtmp" builder
                                          else build_sdiv ir1 ir2 "sdivtmp" builder
                                | Tbmod -> build_srem ir1 ir2 "sremtmp" builder
-                               | Tbeq -> if (e1 = Estr "NULL") then build_is_null ir2 "is_null" builder
-                                         else if (e2 = Estr "NULL") then build_is_null ir1 "is_null" builder
-                                         else if ((e1 = Estr "NULL") && (e2 = Estr "NULL")) then code_gen_exp (Ebool true)
-                                         else
-                                           if(is_double ir1) then build_fcmp Llvm.Fcmp.Oeq ir1 ir2 "icmpeqtmp" builder
-                                           else
-                                             let ir1 = if(is_op_with_pointer ir1) then build_ptrtoint ir1 (int_type) "ptrtoint" builder
-                                                       else ir1 in
-                                             let ir2 = if (is_op_with_pointer ir2) then build_ptrtoint ir2 (int_type) "ptrtoint" builder
-                                                       else ir2 in
-                                             build_icmp Llvm.Icmp.Eq ir1 ir2 "icmpeqtmp" builder
+                               | Tbeq ->     build_icmp Llvm.Icmp.Eq ir1 ir2 "icmpeqtmp" builder
                                | Tbneq -> if (e1 = Estr "NULL") then build_is_null ir2 "is_null" builder
                                          else if (e2 = Estr "NULL") then build_is_null ir1 "is_null" builder
                                          else if ((e1 = Estr "NULL") && (e2 = Estr "NULL")) then code_gen_exp (Ebool false)
@@ -581,9 +571,9 @@ and is_pointer ex =
   match ex with
   | Eid _ -> true
   | Emat _ -> true
-  | Eunop(e,Tutim)->true
-  | Ebop(e,_,_) -> is_pointer e
-  (* | Ast.Paren_expression(e) -> is_pointer e *)
+(*   | Eunop(e,Tutim)->true
+ *)(*   | Ebop(e,_,_) -> is_pointer e
+ *)  (* | Ast.Paren_expression(e) -> is_pointer e *)
   | _ -> false
 
 and is_binary_as ex =

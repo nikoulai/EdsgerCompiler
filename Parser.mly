@@ -101,7 +101,8 @@ open Lexing
 %nonassoc Q_MARK
 %right COMPIF
 %left OR
-%left AND LESS GREATER EQUAL N_EQUAL LESS_EQ GREAT_EQ
+%left AND 
+%left LESS GREATER EQUAL N_EQUAL LESS_EQ GREAT_EQ
 %right ASSIGNMENT
 %left OPERATOR /* all binary_operators for shift/reduce*/
 %left PLUS MINUS
@@ -113,6 +114,7 @@ open Lexing
 %nonassoc LPAREN RPAREN /*see http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual026.html how conflicts are resolved */
 %nonassoc POSTFIX
 %nonassoc PREFIX
+%nonassoc APP
 
 %start start
 
@@ -274,7 +276,7 @@ expression : IDENT { Eid $1 }
 | CHAR_V { Echar $1 }
 | DOUBLE_NUM { Edoub $1 }
 | STRING { Estr $1 }
-| IDENT LPAREN op_exp_list RPAREN { Eapp ($1, $3) }
+| IDENT LPAREN op_exp_list RPAREN %prec APP{ Eapp ($1, $3) }
 | unary_op expression %prec UNOP { Eunop ($2, $1) }
 | unary_assignment expression %prec PREFIX { Eunas ($2, $1) }
 | LPAREN typea RPAREN expression %prec CASTING  { Ecast ($2, $4) }
@@ -283,6 +285,8 @@ expression : IDENT { Eid $1 }
 | DELETE expression { Edel $2 }
 /*| DELETE expression %prec UMINUS {}*/
 | expression LBRACK expression RBRACK %prec POSTFIX { Emat($1, $3) }
+| expression binary_opand expression %prec AND { Ebop ($1, $3, $2) }
+| expression binary_opor expression %prec OR { Ebop ($1, $3, $2) }
 | expression binary_op expression %prec OPERATOR { Ebop ($1, $3, $2) }
 | expression unary_assignment %prec POSTFIX { Eunas1 ($1, $2) }
 | expression binary_assignment expression %prec ASSIGNMENT { Ebas ($1, $3, $2) }
@@ -326,11 +330,16 @@ TIMES %prec TIMES{ Tbtim }
 | GREAT_EQ %prec GREAT_EQ{ Tbgeq }
 | EQUAL %prec EQUAL{ Tbeq }
 | N_EQUAL %prec N_EQUAL{ Tbneq }
-| AND { Tband }
-| OR { Tbor }
 | COMMA %prec COMMA{ Tbcom }
 ;
 
+binary_opand :
+AND { Tband }
+;
+
+binary_opor:
+OR { Tbor }
+;
 
 unary_assignment :
 		PPLUS { Tppl }

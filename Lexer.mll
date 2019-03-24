@@ -52,7 +52,12 @@ rule e_lang = parse
                       }
 
 | '"' (("\\n"|"\\t"|"\\r"|"\\0" | "\\\\" |"\\\'"|"\\\"" | ("\\x" hex_d hex_d)) | [^ ''' '"' '\\'])* '"' as string
-{ STRING string }
+{ STRING (	let s = Str.global_replace (Str.regexp "\\\\n") "\n" string in
+						       	let s = Str.global_replace (Str.regexp "\\\\t") "\t" s in
+						       	let s = Str.global_replace (Str.regexp "\\\\r") "\r" s in
+						       	let s = Str.global_replace (Str.regexp "\\\\\"") "\"" s in
+							String.sub s 1 ((String.length s)-2) 
+							 ) }
 
 | "#include"
 (*{
