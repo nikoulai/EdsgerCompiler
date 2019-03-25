@@ -318,7 +318,8 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
        (* | None -> *)
          let y = code_gen_exp cond in
          let lval = if(ExpCodeGen.need_def cond) then build_load y "tmp" builder else y in
-         let cond_val = build_icmp Icmp.Ne lval (const_int (i1_type context) 0) "ifcond" builder in
+         let zero = if (String.contains(string_of_lltype(type_of y)) '6') then  (const_int (i16_type context) 0) else( if (String.contains(string_of_lltype(type_of y)) '1') then  (const_int (i1_type context) 0) else (const_int (bool_type) 0) )in
+         let cond_val = build_icmp Icmp.Ne lval zero "ifcond" builder in
          let start_bb = insertion_block builder in
          let the_function =block_parent start_bb in
          let then_bb =append_block context "then" the_function in
