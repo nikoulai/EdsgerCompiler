@@ -15,6 +15,8 @@
 let digit = ['0'-'9']
 let id = ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*
 let hex_d = ['a'-'f' 'A'-'F' '0'-'9']
+let escape_char = '\\' ('n' | 't' | 'r' | '0'| '\'' | '\"' |('x' (digit|['A'-'F' 'a'-'f']) (digit|['A'-'F' 'a'-'f'])) | '\\')
+
 rule e_lang = parse
 
 | "bool" { BOOL }
@@ -44,7 +46,8 @@ rule e_lang = parse
 | digit+ '.' digit+ (('e'|'E') ('+'|'-')? (digit+))? as fnum
 { DOUBLE_NUM (float_of_string fnum) }
 
-| '\'' '\\' ('n' | 't' | 'r' | '0'| '\'' | '\"' |('x' (digit|['A'-'F' 'a'-'f']) (digit|['A'-'F' 'a'-'f'])) | '\\') '\'' as character
+         | '\'' [^ '\\' '\"' '\''] '\'' as character  
+         | '\'' escape_char '\'' as character
            		    { let c = Str.global_replace (Str.regexp "\\\\n") "\n" character in
 	 		      let c = Str.global_replace (Str.regexp "\\\\t") "\t" c in
 	 		      let c = Str.global_replace (Str.regexp "\\\\r") "\r" c in
