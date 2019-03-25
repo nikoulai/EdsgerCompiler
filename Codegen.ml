@@ -186,7 +186,11 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
        let value = init_value ty in (* NOT SURE IF WE WANT THE POINTER TO BE NULL AT FIRST *)
        let _ = match !env with
          | Global (_) -> let _ = List.iter (fun x -> match x with
-                                                     | Ast.Decl(name,_) -> ignore(env := update_env name (!env))
+                                                     | Ast.Decl(name,e) ->
+                                                     Printf.printf "??";
+                                                     print_opt_expr e;
+                                                     Printf.printf "??";
+                                                     ignore(env := update_env name (!env))
                                                      (* | Ast.Complex_declarator(name, _) -> ignore(env := update_env name (!env)) *)
                                                      )
                                            decs
@@ -196,21 +200,22 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
          | Nested _ ->ignore(
                           List.map (fun dec ->
                               match dec with
-                              | Ast.Decl(name,_) ->
-                                 (* Printf.printf "I'm here adding %s\n" name; *)
-                                 let alloca = build_alloca typos name builder in
+                              | Ast.Decl(name,ex) ->(
+                                  match ex with
+                                  | Some e->( print_expr e;
+                                  let malloc = build_alloca ( pointer_type typos ) name builder in
+                                  let _ = Hashtbl.add named_values name malloc in
+                                  let arr = build_array_malloc typos (code_gen_exp (e) ) "mallocttmp" builder in let arr = build_bitcast arr (pointer_type typos) "tmp" builder  in let _ = build_store arr malloc builder in malloc
+                                  ;()
+                                  )
+                                  | _ -> (
+                                  let alloca = build_alloca typos name builder in
                                  ignore(build_store value alloca builder);
                                  Hashtbl.add named_values name alloca;
                                  env := update_env name (!env)
-                              (* | Ast.Complex_declarator(name, exp) ->
-                                 let leng = code_gen_exp exp in
-                                 (* dump_value leng; *)(* we have the length of the array in llvalue *)
-                                 let decl = build_alloca (pointer_type typos) name builder in
-                                 let alloca = build_array_malloc (typos) leng "allocatmp" builder in (* or build array malloc/alloca *)
-                                 let _ = build_store alloca decl builder in
-                                 Hashtbl.add named_values name decl;
-                                 env := update_env name !env *)
-                            (* HAVE TO CHECK IT AGAIN *)
+                                 )
+
+                            )
                             ) decs) in
        const_null null_type;
 
@@ -405,8 +410,9 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
        (* 2 now we have to check the condition *)
        let loop_cond =  match e2 with
          | None -> const_null null_type
-         | Some exp -> let tmp = code_gen_exp exp in if (is_pointer exp) then build_load tmp "loadcon" builder else
-                                                       tmp
+         | Some exp ->code_gen_exp exp
+          (* let tmp = code_gen_exp exp in if (is_pointer exp) then build_load tmp "loadcon" builder else
+                                                       tmp *)
 
        in
 
@@ -525,6 +531,35 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
                             (* dump_value lltype; *) lltype)
                        (* |_ -> raise (Tnone "problem with value allocation") *)
                        )
+and print_expr e =
+Printf.printf "!!!";
+ Printf.printf  (  match e with
+                    Eid _  -> "Eid"
+                    | Ebool _  -> "Ebool"
+                    | Enull _ -> "Enull"
+                    | Eint _  -> "Eint"
+                    | Echar _  -> "Echar"
+                    | Edoub _  -> "Edoub"
+                    | Estr _  -> "Estr"
+                   | Eapp _  -> "Eapp"
+                   | Eunop _ -> "Eunop"
+                   | Eunas _ -> "Eunas"
+                   | Eunas1 _ -> "Eunas1"
+                   | Ebop _  -> "Ebop"
+                   | Ebas _ -> "Ebas"
+                   | Ecast _ -> "Ecast"
+                   | Enew _  -> "Enew"
+                   | Edel _ -> "Edel"
+                   | Emat _ -> "Emat"
+                   | Eif _  -> "Eif"
+
+                   );
+  Printf.printf "!!!"
+  and print_opt_expr e =(
+    match e with
+    | Some ex-> print_expr ex; ()
+    | _ -> ()
+    )
  and codegen_lib () =
                  let _ = Hashtbl.add named_values ("writeString")  (declare_function "writeString" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tptr Tchar)|]) the_module ) in
                  let _ = Hashtbl.add named_values ("writeInteger")  (declare_function "writeInteger" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tint)|]) the_module ) in
