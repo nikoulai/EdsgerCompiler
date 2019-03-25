@@ -205,7 +205,7 @@ let rec code_gen_exp exp =
    let args = args@env_args in
    let args = Array.of_list args in
    let args = Array.mapi
-                ( fun i a -> let e = code_gen_exp args.(i) in 
+                ( fun i a -> let e = code_gen_exp args.(i) in
                              if(is_pointer args.(i)) then
                                (let typical_param = String.length(string_of_lltype (type_of(params.(i)))) in
                                 let actual_param = String.length( string_of_lltype ( type_of(e))) in
@@ -385,13 +385,21 @@ let rec code_gen_exp exp =
                          delete_instruction lhs4del;
                          let null = const_null ty in
                          build_store null lhs builder
-       | _ ->
+       | e ->
+          print_expr e;
+          Printf.printf":fuckinghere\n";
+          match e with
+          Ebas (a,b,c) ->
+          let _ = code_gen_exp (Ebas(a,b,c)) in
+          let rhs = code_gen_exp b in
+          let rhs = if(need_def e2) then build_load rhs "tmp" builder else rhs in
+          let lhs = getAddress e1 in
+          let _ = build_store rhs lhs builder in
+          lhs
+          | _ ->
           let rhs = code_gen_exp e2 in
-          let rhs = (* dump_type (type_of(rhs)); *)
-            if(is_pointer e2) then build_load rhs "loadtmp" builder
-            else rhs
-          in
-          let lhs = code_gen_exp e1 in
+          let rhs = if(need_def e2) then build_load rhs "tmp" builder else rhs in
+          let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
           lhs
       )
@@ -516,7 +524,7 @@ and bool_to_int n =
   | false -> 0
   | true -> 1
 
-and is_pointer ex =let _=Printf.printf  (  match ex with 
+and is_pointer ex =let _=Printf.printf  (  match ex with
                     Eid   _-> "Eid"
                    | Ebool  _-> "Ebool"
                    | Enull _-> "Enull"
@@ -535,7 +543,7 @@ and is_pointer ex =let _=Printf.printf  (  match ex with
                    | Edel _-> "Edel"
                    | Emat _-> "Emat"
                    | Eif  _-> "Eif"
-                   )in 
+                   )in
   match ex with
   | Eid _ -> true
   | Emat _ -> true
@@ -556,7 +564,7 @@ and is_double ir =
 
 and is_op_with_pointer ir =
   let ty = string_of_lltype (type_of ir) in
-  if ((contains ty "*")) then  true
+  if ((contains ty "*")) then (Printf.printf "heeeeeeereee"; true)
   else false
 
 and is_void callee =
@@ -590,7 +598,51 @@ and  ltype_of_type = function
         | Tptr t -> pointer_type (ltype_of_type t)
         | Tarray (a,b) ->array_type (ltype_of_type a) b
         | Tnone -> ltype_of_type Tvoid
+and getAddress expr =  match expr with
+ Eid(x) ->  Hashtbl.find named_values  x
+ (* | Ebas(a,b,c) ->Printf.printf "d---f";code_gen_exp(Ebas(a,b,c)); code_gen_exp b *)
+ |Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
+         let tmp_val =  build_load (get_identifier x ) "tmp" builder in
+ let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
+ | e -> print_expr e; const_null ( i1_type context)
+ (* | e -> (
+   match e with
+   |Tuamp(x)->  let y =  (get_identifier x ) in
+          let dereference = build_struct_gep y 0 "tmp" builder in build_load dereference "tmp" builder
+   | v  ->
+    match v with
+   |Tptr(x)-> let y =  (get_identifier x ) in let load_ = build_load y "temp" builder in load_
+   )
+ *)
 
+and get_identifier s = match s with
+       Eid(a) ->Hashtbl.find named_values  a
+       |_ -> code_gen_exp s
+
+
+        and print_expr e =
+        Printf.printf "\n!!\n";
+         Printf.printf  (  match e with
+                            Eid _  -> "Eid"
+                            | Ebool _  -> "Ebool"
+                            | Enull _ -> "Enull"
+                            | Eint _  -> "Eint"
+                            | Echar _  -> "Echar"
+                            | Edoub _  -> "Edoub"
+                            | Estr _  -> "Estr"
+                           | Eapp _  -> "Eapp"
+                           | Eunop _ -> "Eunop"
+                           | Eunas _ -> "Eunas"
+                           | Eunas1 _ -> "Eunas1"
+                           | Ebop _  -> "Ebop"
+                           | Ebas _ -> "Ebas"
+                           | Ecast _ -> "Ecast"
+                           | Enew _  -> "Enew"
+                           | Edel _ -> "Edel"
+                           | Emat _ -> "Emat"
+                           | Eif _  -> "Eif"
+
+                           );
 
 and may f = function
 
