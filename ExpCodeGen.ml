@@ -19,7 +19,7 @@ let named_values:(string, llvalue) Hashtbl.t = Hashtbl.create 10
 let int_type = i16_type context
 let double_type =  x86fp80_type context
 let char_type = i8_type context
-let bool_type = i8_type context
+let bool_type = i1_type context
 let fun_names : string list ref = ref []
 let env:environment ref = ref (Global ([]))
 let global_decs : (Ast.ast_declaration) list ref = ref []
@@ -31,7 +31,7 @@ let rec findLltype ty =
   | Tarray (t,n) -> let t = findLltype t in
                         array_type t n
   | Tchar -> i8_type context
-  | Tbool -> i8_type context
+  | Tbool -> i1_type context
   | Tptr x -> let t = findLltype x in
                       pointer_type t
   | _ -> (Error.error "Unknown type"; i1_type context)
@@ -326,7 +326,7 @@ let rec code_gen_exp exp =
                                               let ir2 = if (is_op_with_pointer ir2) then build_ptrtoint ir2 (int_type) "ptrtoint" builder
                                                         else ir2 in
                                               build_icmp Llvm.Icmp.Sge ir1 ir2 "icmpsgetmp" builder
-                               | Tband -> let ir1_i1 = build_trunc_or_bitcast ir1 (i1_type context) "first_cast" builder in
+                               | Tband ->let ir1_i1 = build_trunc_or_bitcast ir1 (i1_type context) "first_cast" builder in
                                          let ir2_i1 = build_trunc_or_bitcast ir2 (i1_type context) "second_cast" builder in
                                          build_and ir1_i1 ir2_i1 "andtmp" builder
                                | Tbor -> let ir1_i1 = build_trunc_or_bitcast ir1 (i1_type context) "first_cast" builder in
@@ -567,14 +567,33 @@ and bool_to_int n =
   | false -> 0
   | true -> 1
 
-and is_pointer ex =
+and is_pointer ex =let _=Printf.printf  (  match ex with 
+                    Eid   _-> "Eid"
+                   | Ebool  _-> "Ebool"
+                   | Enull _-> "Enull"
+                   | Eint  _-> "Eint"
+                   | Echar  _-> "Echar"
+                   | Edoub  _-> "Edoub"
+                   | Estr  _-> "Estr"
+                   | Eapp  _-> "Eapp"
+                   | Eunop _-> "Eunop"
+                   | Eunas _-> "Eunas"
+                   | Eunas1 _-> "Eunas1"
+                   | Ebop  _-> "Ebop"
+                   | Ebas _-> "Ebas"
+                   | Ecast _-> "Ecast"
+                   | Enew  _-> "Enew"
+                   | Edel _-> "Edel"
+                   | Emat _-> "Emat"
+                   | Eif  _-> "Eif"
+                   )in 
   match ex with
   | Eid _ -> true
   | Emat _ -> true
 (*   | Eunop(e,Tutim)->true
  *)(*   | Ebop(e,_,_) -> is_pointer e
  *)  (* | Ast.Paren_expression(e) -> is_pointer e *)
-  | _ -> false
+  | _ ->  false
 
 and is_binary_as ex =
   match ex with
@@ -606,7 +625,8 @@ and need_def = function
         | Emat _ ->true
         (* |(* Eplus (e1,_) | Ediv (e1,_) | Eminus (e1,_) | Emod (e1,_) | Emod (e1,_) | Emult (e1,_) | Eand (e1,_) | Eor (e1,_) | *)(*| EUnAdd e1 |EUnMinus e1 *) EPlusPlus (e1,_) | EMinusMinus (e1,_)  -> false *)
         |  _->false
-and default_val_type smth = match smth with
+and default_val_type smth =
+        match smth with
         | Tint ->  const_int (ltype_of_type smth) 0
         | Tbool -> const_int (ltype_of_type smth) 0
         | Tchar -> const_int (ltype_of_type smth) 0

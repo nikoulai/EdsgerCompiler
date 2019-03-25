@@ -13,7 +13,7 @@ let rec sizeOfType t =
    | Tchar           -> 1
    | Tbool           -> 1
    | Tdouble         -> 10
-   | Tptr et          -> 2
+   | Tptr et          -> 1
    | Tarray (et, sz) -> sz * sizeOfType et (*immutable pointer has fixed size*)
    | _                   -> 0
 

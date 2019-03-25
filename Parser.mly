@@ -97,7 +97,6 @@ open Lexing
 %nonassoc OPOP 
 %nonassoc TtypeaS /*for typea_t shift/reduce conflict */
 
-%right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
 %nonassoc Q_MARK
 %right COMPIF
 %left OR
@@ -105,6 +104,7 @@ open Lexing
 %left LESS GREATER EQUAL N_EQUAL LESS_EQ GREAT_EQ
 %right ASSIGNMENT
 %left OPERATOR /* all binary_operators for shift/reduce*/
+%right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
 %left PLUS MINUS
 %left TIMES DIV MOD
 %nonassoc CASTING /*bonus*/
