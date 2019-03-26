@@ -103,9 +103,10 @@ open Lexing
 %left AND 
 %left LESS GREATER EQUAL N_EQUAL LESS_EQ GREAT_EQ
 %right ASSIGNMENT
-%left OPERATOR /* all binary_operators for shift/reduce*/
+%left LOPERATOR /* all binary_operators for shift/reduce*/
 %right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
 %left PLUS MINUS
+%left AOPERATOR /* all binary_operators for shift/reduce*/
 %left TIMES DIV MOD
 %nonassoc CASTING /*bonus*/
 %nonassoc PPLUS MMINUS
@@ -147,7 +148,8 @@ open Lexing
 %type <ast_expr> constant_exp
 %type <ast_unop> unary_op
 %type <ast_unas> unary_assignment
-%type <ast_bop> binary_op
+%type <ast_bop> binary_op_a
+%type <ast_bop> binary_op_l
 %type <ast_bas> binary_assignment
 
 %%
@@ -287,7 +289,8 @@ expression : IDENT { Eid $1 }
 | expression LBRACK expression RBRACK %prec POSTFIX { Emat($1, $3) }
 | expression binary_opand expression %prec AND { Ebop ($1, $3, $2) }
 | expression binary_opor expression %prec OR { Ebop ($1, $3, $2) }
-| expression binary_op expression %prec OPERATOR { Ebop ($1, $3, $2) }
+| expression binary_op_a expression %prec AOPERATOR { Ebop ($1, $3, $2) }
+| expression binary_op_l expression %prec LOPERATOR { Ebop ($1, $3, $2) }
 | expression unary_assignment %prec POSTFIX { Eunas1 ($1, $2) }
 | expression binary_assignment expression %prec ASSIGNMENT { Ebas ($1, $3, $2) }
 | expression Q_MARK expression COLON expression %prec COMPIF { Eif ($1, $3, $5) }
@@ -318,19 +321,22 @@ unary_op :
 ;
 
 
-binary_op :
-TIMES %prec TIMES{ Tbtim }
-| DIV %prec DIV{ Tbdiv }
-| MOD %prec MOD{ Tbmod }
-| PLUS %prec PLUS{ Tbpl }
-| MINUS %prec MINUS{ Tbmin }
-| LESS %prec LESS{ Tblss }
-| GREATER %prec GREATER{ Tbgrt }
-| LESS_EQ %prec LESS_EQ{ Tbleq }
-| GREAT_EQ %prec GREAT_EQ{ Tbgeq }
-| EQUAL %prec EQUAL{ Tbeq }
-| N_EQUAL %prec N_EQUAL{ Tbneq }
-| COMMA %prec COMMA{ Tbcom }
+binary_op_a :
+TIMES { Tbtim }
+| DIV { Tbdiv }
+| MOD { Tbmod }
+| PLUS { Tbpl }
+| MINUS { Tbmin }
+;
+
+binary_op_l :
+LESS { Tblss }
+| GREATER { Tbgrt }
+| LESS_EQ { Tbleq }
+| GREAT_EQ { Tbgeq }
+| EQUAL { Tbeq }
+| N_EQUAL { Tbneq }
+| COMMA { Tbcom }
 ;
 
 binary_opand :
