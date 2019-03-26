@@ -390,8 +390,10 @@ let rec code_gen_exp exp =
           Printf.printf":fuckinghere\n";
           match e with
           Ebas (a,b,c) ->
-          let _ = code_gen_exp (Ebas(a,b,c)) in
-          let rhs = code_gen_exp b in
+
+          (* let _ = code_gen_exp (Ebas(a,b,c)) in *)
+          let rhs = code_gen_exp (returnExpr e2) in
+          let _ = codegen_multiple_assign e2 rhs in
           let rhs = if(need_def e2) then build_load rhs "tmp" builder else rhs in
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
@@ -551,6 +553,23 @@ and is_pointer ex =let _=Printf.printf  (  match ex with
  *)(*   | Ebop(e,_,_) -> is_pointer e
  *)  (* | Ast.Paren_expression(e) -> is_pointer e *)
   | _ ->  false
+
+and returnExpr a =
+  match a with
+  Ebas(a,b,c) -> returnExpr b
+  | b -> b
+and codegen_multiple_assign a rhs =
+  match a with
+  Ebas(a,b,c) -> (
+              codegen_multiple_assign b rhs;
+              let lhs = getAddress a in
+              let _ = build_store rhs lhs builder in
+              lhs
+
+    )
+  | _ ->  const_null ( i1_type context);
+
+
 
 and is_binary_as ex =
   match ex with
