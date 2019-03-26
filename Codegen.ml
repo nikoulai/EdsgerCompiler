@@ -410,7 +410,11 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
        (* 2 now we have to check the condition *)
        let loop_cond =  match e2 with
          | None -> const_null null_type
-         | Some exp ->code_gen_exp exp
+         | Some exp ->(
+           match exp with
+           | Eid a -> code_gen_exp (Ebop(((Eid a),Ebool(true),Tbeq)))
+           | _ -> code_gen_exp exp
+           )
           (* let tmp = code_gen_exp exp in if (is_pointer exp) then build_load tmp "loadcon" builder else
                                                        tmp *)
 
