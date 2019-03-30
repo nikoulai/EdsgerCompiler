@@ -106,7 +106,6 @@ open Lexing
 %left LOPERATOR /* all binary_operators for shift/reduce*/
 %right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
 %left PLUS MINUS
-%left AOPERATOR /* all binary_operators for shift/reduce*/
 %left TIMES DIV MOD
 %nonassoc CASTING /*bonus*/
 %nonassoc PPLUS MMINUS
@@ -148,7 +147,8 @@ open Lexing
 %type <ast_expr> constant_exp
 %type <ast_unop> unary_op
 %type <ast_unas> unary_assignment
-%type <ast_bop> binary_op_a
+%type <ast_bop> binary_op_a_p
+%type <ast_bop> binary_op_a_t
 %type <ast_bop> binary_op_l
 %type <ast_bas> binary_assignment
 
@@ -289,7 +289,8 @@ expression : IDENT { Eid $1 }
 | expression LBRACK expression RBRACK %prec POSTFIX { Emat($1, $3) }
 | expression binary_opand expression %prec AND { Ebop ($1, $3, $2) }
 | expression binary_opor expression %prec OR { Ebop ($1, $3, $2) }
-| expression binary_op_a expression %prec AOPERATOR { Ebop ($1, $3, $2) }
+| expression binary_op_a_p expression %prec PLUS { Ebop ($1, $3, $2) }
+| expression binary_op_a_t expression %prec TIMES { Ebop ($1, $3, $2) }
 | expression binary_op_l expression %prec LOPERATOR { Ebop ($1, $3, $2) }
 | expression unary_assignment %prec POSTFIX { Eunas1 ($1, $2) }
 | expression binary_assignment expression %prec ASSIGNMENT { Ebas ($1, $3, $2) }
@@ -321,11 +322,14 @@ unary_op :
 ;
 
 
-binary_op_a :
+binary_op_a_t :
 TIMES { Tbtim }
 | DIV { Tbdiv }
 | MOD { Tbmod }
-| PLUS { Tbpl }
+;
+
+binary_op_a_p :
+PLUS { Tbpl }
 | MINUS { Tbmin }
 ;
 
