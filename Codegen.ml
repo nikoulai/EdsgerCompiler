@@ -182,6 +182,8 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
     | Ast.Vardecl(ty, decs) ->
        (* Printf.printf("Var dec\n"); *)
        (*let _ = block_parent (insertion_block builder) in*)
+
+       (* print_ast_type ty; *)
        let typos = type_to_lltype ty in (*we want the type of the vars *)
        let value = init_value ty in (* NOT SURE IF WE WANT THE POINTER TO BE NULL AT FIRST *)
        let _ = match !env with
@@ -202,7 +204,8 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
                               match dec with
                               | Ast.Decl(name,ex) ->(
                                   match ex with
-                                  | Some e->( print_expr e;
+                                  | Some e->(
+                                     (* print_expr e; *)
                                   let malloc = build_alloca ( pointer_type typos ) name builder in
                                   let _ = Hashtbl.add named_values name malloc in
                                   let arr = build_array_malloc typos (code_gen_exp (e) ) "mallocttmp" builder in let arr = build_bitcast arr (pointer_type typos) "tmp" builder  in let _ = build_store arr malloc builder in malloc
@@ -536,7 +539,7 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
                        (* |_ -> raise (Tnone "problem with value allocation") *)
                        )
 and print_expr e =
-Printf.printf "!!!";
+(* Printf.printf "!!!"; *)
  Printf.printf  (  match e with
                     Eid _  -> "Eid"
                     | Ebool _  -> "Ebool"
@@ -561,9 +564,20 @@ Printf.printf "!!!";
   Printf.printf "!!!"
   and print_opt_expr e =(
     match e with
-    | Some ex-> print_expr ex; ()
+    | Some ex-> ()
     | _ -> ()
     )
+    and print_ast_type ast =
+      match ast with
+      | Tint -> Printf.printf "int ";
+      | Tchar -> Printf.printf "char ";
+      | Tbool -> Printf.printf "bool ";
+      | Tdouble -> Printf.printf "double ";
+      | Tptr (typ1) -> print_ast_type typ1; Printf.printf "*";
+      | Tarray (typ1,i) -> print_ast_type typ1; Printf.printf "["; Printf.printf "%d" i; Printf.printf "]";
+      (* | Tvoid -> fprintf "void ";
+      | Tnone -> fprintf "None type, probably an error "; *)
+
  and codegen_lib () =
                  let _ = Hashtbl.add named_values ("writeString")  (declare_function "writeString" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tptr Tchar)|]) the_module ) in
                  let _ = Hashtbl.add named_values ("writeInteger")  (declare_function "writeInteger" (function_type (type_to_lltype Tvoid) [|type_to_lltype(Tint)|]) the_module ) in

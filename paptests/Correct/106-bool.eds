@@ -7,7 +7,8 @@ void main ()
 
     a = 1; b = 2; c = 3;
     x = true;
-    y = (a>2) || (c<b) ;
+    y = (a>2) || (c<b) && (a==b);
+    z = !(c<3) || (a>4);
 
     writeBoolean(x);
     writeBoolean(y);
