@@ -301,9 +301,10 @@ let rec code_gen_exp exp =
                                | Tband ->let ir1_i1 = build_trunc_or_bitcast ir1 (i1_type context) "first_cast" builder in
                                          let ir2_i1 = build_trunc_or_bitcast ir2 (i1_type context) "second_cast" builder in
                                          build_and ir1_i1 ir2_i1 "andtmp" builder
-                               | Tbor -> let ir1_i1 = build_trunc_or_bitcast ir1 (i1_type context) "first_cast" builder in
-                                         let ir2_i1 = build_trunc_or_bitcast ir2 (i1_type context)"second_cast" builder in
-                                         build_or ir1_i1 ir2_i1 "ortmp" builder
+                               | Tbor ->
+                                        (* let ir1_i1 = build_trunc_or_bitcast ir1 (i1_type context) "first_cast" builder in
+                                         let ir2_i1 = build_trunc_or_bitcast ir2 (i1_type context)"second_cast" builder in *)
+                                         build_or ir1 ir2 "ortmp" builder
                                | Tbcom ->
                                   ir2
                                | _ -> (Error.error "%s: Unkown binary operator while producing IR" ("") ;const_null int_type)
@@ -583,7 +584,8 @@ and is_double ir =
 
 and is_op_with_pointer ir =
   let ty = string_of_lltype (type_of ir) in
-  if ((contains ty "*")) then (Printf.printf "heeeeeeereee"; true)
+  (* if ((contains ty "*")) then (Printf.printf "heeeeeeereee"; true) *)
+  if ((contains ty "*")) then ( true)
   else false
 
 and is_void callee =

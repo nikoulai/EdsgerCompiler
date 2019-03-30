@@ -18,7 +18,22 @@ let rec sizeOfType t =
    | _                   -> 0
 
 let rec equalType t1 t2 =
+   (* print_expr t1;print_expr t2; *)
    match t1, t2 with
    | Tarray (et1, sz1), Tarray (et2, sz2) -> equalType et1 et2
    | Tptr et1, Tptr et2                   -> equalType et1 et2
    | _                                            -> t1 = t2
+
+ and print_expr e =
+   Printf.printf "\n!!\n";
+    Printf.printf  (  match e with
+                | Tnone  _ -> "Tnone"
+               | Tint _ -> "Tint"
+               | Tchar _  -> "Tchar"
+               | Tbool _  -> "Tbool"
+               | Tdouble  _ -> "Tdouble"
+               | Tptr  _ -> "Tptr"
+               | Tarray  _  -> "Tarray"
+               | Tvoid  _ -> "Tvoid"
+
+                      );

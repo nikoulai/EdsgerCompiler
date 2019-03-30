@@ -55,13 +55,15 @@ let rec  getType expr = match expr with
             )
           | Tblss | Tbgrt | Tbleq | Tbgeq | Tbeq | Tbneq -> (match (getType x,getType y) with
             | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool)  -> Tbool
-            | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c1" ;Tnone)
-            | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c1" ;Tnone)
-            | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c1" ;Tnone)
+            | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c11" ;Tnone)
+            | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c12" ;Tnone)
+            | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c13" ;Tnone)
             | _ ->error "sigkrisi xriazete arithmous";Tnone)
           | Tband | Tbor -> (match (getType x,getType y) with
             | (Tbool ,Tbool) ->Tbool
-            | _ -> printType (getType x); printType (getType y);error "type missimatch on boolean action" ; Tnone )
+            | _ ->
+             (* printType (getType x); printType (getType y); *)
+            error "type missimatch on boolean action" ; Tnone )
           | Tbcom -> getType y
           | _ -> (match (getType x,getType y) with | (Tptr x1,Tint) -> Tptr x1
             | (Tint,x1) -> x1
@@ -262,3 +264,26 @@ and check_main () =
 (*and add_suffix param_list =
   let suffix = List.map (fun x -> match x with | Param (t,_) -> convert_tto_char t | ParamByRef (t,_) -> convert_tto_char t) param_list in String.concat "" suffix
 *)
+and print_expr e =
+Printf.printf "\n!!\n";
+ Printf.printf  (  match e with
+                    Eid _  -> "Eid"
+                    | Ebool _  -> "Ebool"
+                    | Enull _ -> "Enull"
+                    | Eint _  -> "Eint"
+                    | Echar _  -> "Echar"
+                    | Edoub _  -> "Edoub"
+                    | Estr _  -> "Estr"
+                   | Eapp _  -> "Eapp"
+                   | Eunop _ -> "Eunop"
+                   | Eunas _ -> "Eunas"
+                   | Eunas1 _ -> "Eunas1"
+                   | Ebop _  -> "Ebop"
+                   | Ebas _ -> "Ebas"
+                   | Ecast _ -> "Ecast"
+                   | Enew _  -> "Enew"
+                   | Edel _ -> "Edel"
+                   | Emat _ -> "Emat"
+                   | Eif _  -> "Eif"
+
+                   );

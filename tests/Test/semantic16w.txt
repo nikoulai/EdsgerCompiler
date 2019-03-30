@@ -17,5 +17,5 @@ void yet_another_pointer_test () {
      b = z[100][9];
      z = NULL;
 
-     
+
 }

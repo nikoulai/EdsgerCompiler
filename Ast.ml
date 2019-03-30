@@ -139,7 +139,7 @@ and print_ast_declarator ppf var =
     (match maybe_expr with
        | None -> ()
        | Some i ->
-        fprintf ppf "[";
+        fprintf ppf "11[";
         print_ast_expr ppf i;
         fprintf ppf "]";
     )
@@ -297,9 +297,12 @@ and print_ast_expr ppf ast =
   fprintf ppf " )";
   | Ebas (expr1, expr2, bas) ->
   fprintf ppf " Ebas";
+  fprintf ppf "(";
+
     print_ast_expr ppf expr1;
     print_ast_bas ppf bas;
     print_ast_expr ppf expr2;
+    fprintf ppf ") ";
   | Ecast (typ, expr) ->
   fprintf ppf " Ecast";
     fprintf ppf "(";
@@ -319,7 +322,7 @@ and print_ast_expr ppf ast =
   | Emat (expr1, expr2) ->
   fprintf ppf " Emat";
     print_ast_expr ppf expr1;
-    fprintf ppf "[";
+    fprintf ppf "1[1";
     print_ast_expr ppf expr2;
     fprintf ppf "] ";
   | Eif (expr1, expr2, expr3) ->
