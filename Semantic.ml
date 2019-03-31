@@ -39,7 +39,11 @@ let rec  getType expr = match expr with
         |Enull -> Tnone
 (*        |EPointer x -> Tptr (getType x)*)
         | Eunop (x, z) -> (match z with
-          | Tuamp -> Tptr (getType x)
+          | Tuamp -> printf("Ampersand"); Tptr (getType x)
+          | Tutim -> printf("Dereference");
+                     (match (getType x) with
+                     (Tptr y) -> y
+                      | _ -> error "Dereferencing a non pointer"; Tnone)
           | _ -> getType x
           )
         | Eunas (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with
@@ -90,7 +94,12 @@ let rec  getType expr = match expr with
             )
           )
         | Ecast (x,y) -> if castAllow x (getType y) then x else getType y
-        | Eif (x,y,z)-> if (getType x = Tbool) then (if equalType (getType y) (getType z) then getType y else (error "question type1"; Tnone )) else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
+        | Eif (x,y,z)->
+        if (getType x = Tbool)
+          then (if equalType (getType y) (getType z)
+            then getType y 
+            else (error "question type1"; Tnone ))
+          else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
         | Enew (x,_) -> x
         | Edel _ -> Tnone
         | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)

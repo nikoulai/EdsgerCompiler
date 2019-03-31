@@ -228,11 +228,13 @@ let rec code_gen_exp exp =
                     let ir = build_gep act_array index "arraytmp" builder in
                     ir
 | Eunop (e,op) -> (match op with
-                      |  Tuamp->  code_gen_exp e
-                      (* FIX THIS *)
-                      | Tutim -> let exp_ir = code_gen_exp e in
-                               let tmp_ir = build_load exp_ir "loadtmp" builder in
-                               tmp_ir
+                      |  Tuamp->
+                        Printf.printf"Ampersand\n"; code_gen_exp e
+                      | Tutim -> 
+                       Printf.printf"Dereferencing\n";
+                       (let exp_ir = code_gen_exp e in
+                            let tmp_ir = build_load exp_ir "loadtmp" builder in
+                            tmp_ir)
                       | Tumin -> let expr = Ebop(Eint 0, e ,Tbmin) in
                                code_gen_exp expr
                       | Tupl -> code_gen_exp e
@@ -536,7 +538,7 @@ and is_pointer ex =let _=Printf.printf  (  match ex with
                    | Edoub  _-> "Edoub"
                    | Estr  _-> "Estr"
                    | Eapp  _-> "Eapp"
-                   | Eunop _-> "Eunop"
+                   | Eunop _-> "Eunop!!"
                    | Eunas _-> "Eunas"
                    | Eunas1 _-> "Eunas1"
                    | Ebop  _-> "Ebop"
@@ -550,8 +552,8 @@ and is_pointer ex =let _=Printf.printf  (  match ex with
   match ex with
   | Eid _ -> true
   | Emat _ -> true
-(*   | Eunop(e,Tutim)->true
- *)(*   | Ebop(e,_,_) -> is_pointer e
+  | Eunop(e,Tutim)->true
+ (*   | Ebop(e,_,_) -> is_pointer e
  *)  (* | Ast.Paren_expression(e) -> is_pointer e *)
   | _ ->  false
 
@@ -625,7 +627,8 @@ and getAddress expr =  match expr with
  |Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
          let tmp_val =  build_load (get_identifier x ) "tmp" builder in
  let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
- | e -> print_expr e; const_null ( i1_type context)
+ | e -> Printf.printf "Nikakios"; print_expr e; code_gen_exp e
+ (* const_null ( i1_type context) *)
  (* | e -> (
    match e with
    |Tuamp(x)->  let y =  (get_identifier x ) in
