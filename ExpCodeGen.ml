@@ -388,11 +388,7 @@ let rec code_gen_exp exp =
                          delete_instruction lhs4del;
                          let null = const_null ty in
                          build_store null lhs builder
-       | e ->
-          print_expr e;
-          Printf.printf":fuckinghere\n";
-          match e with
-          Ebas (a,b,c) ->
+      |  Ebas (a,b,c) ->
 
           (* let _ = code_gen_exp (Ebas(a,b,c)) in *)
           let rhs = code_gen_exp (returnExpr e2) in
@@ -401,8 +397,15 @@ let rec code_gen_exp exp =
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
           lhs
+          | Eunop (expr, Tutim) ->
+          let rhs = code_gen_exp e2 in 
+          let rhs =  build_load rhs "tmp" builder in
+          let lhs = getAddress e1 in
+          let _ = build_store rhs lhs builder in
+          lhs
+
           | _ ->
-          let rhs = code_gen_exp e2 in
+          let rhs = code_gen_exp e2 in 
           let rhs = if(need_def e2) then build_load rhs "tmp" builder else rhs in
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
@@ -624,9 +627,9 @@ and  ltype_of_type = function
 and getAddress expr =  match expr with
  Eid(x) ->  Hashtbl.find named_values  x
  (* | Ebas(a,b,c) ->Printf.printf "d---f";code_gen_exp(Ebas(a,b,c)); code_gen_exp b *)
- |Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
+ | Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
          let tmp_val =  build_load (get_identifier x ) "tmp" builder in
- let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
+         let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
  | e -> Printf.printf "Nikakios"; print_expr e; code_gen_exp e
  (* const_null ( i1_type context) *)
  (* | e -> (
