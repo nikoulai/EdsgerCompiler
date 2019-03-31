@@ -38,11 +38,12 @@ let rec  getType expr = match expr with
         |Estr x ->Tarray(Tchar,String.length x)
         |Enull -> Tnone
 (*        |EPointer x -> Tptr (getType x)*)
-        | Eunop (x, z) -> (match z with
-          | Tuamp -> printf("Ampersand"); Tptr (getType x)
-          | Tutim -> printf("Dereference");
+        | Eunop (x, z) ->(match z with
+          | Tuamp -> printf("Ampersand\n"); Tptr (getType x)
+          | Tutim -> printf("Dereference\n"); print_expr_t (getType x);
                      (match (getType x) with
-                     (Tptr y) -> y
+                      Tptr y -> y
+                      | Tarray (y, a)  -> y
                       | _ -> error "Dereferencing a non pointer"; Tnone)
           | _ -> getType x
           )
@@ -105,6 +106,19 @@ let rec  getType expr = match expr with
         | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)
         | Eapp (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result
         | _ -> Tnone
+ and print_expr_t e =
+   Printf.printf "What?\n";
+    Printf.printf  (  match e with
+                | Tnone  _ -> "Tnone"
+               | Tint _ -> "Tint"
+               | Tchar _  -> "Tchar"
+               | Tbool _  -> "Tbool"
+               | Tdouble  _ -> "Tdouble"
+               | Tptr  _ -> "Tptr"
+               | Tarray  _  -> "Tarray"
+               | Tvoid  _ -> "Tvoid"
+
+                      );
 and  castAllow x y = match (x,  y) with
 | (Tdouble ,Tint)| (Tint,Tdouble) -> true
 | (Tbool ,_) -> true
@@ -251,6 +265,7 @@ and check_statement stm =
      check_fun_type (typos) (Tvoid))
     | Some expr ->
        ignore (check_fun_type (!currentScope.sco_type) (getType expr)));
+| Snull -> ()
 (* ignore(Symbtest.printSymbolTable());    *)
 
 and check_fun_type scope_typ typ =

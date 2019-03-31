@@ -139,7 +139,7 @@ and print_ast_declarator ppf var =
     (match maybe_expr with
        | None -> ()
        | Some i ->
-        fprintf ppf "11[";
+        fprintf ppf "[";
         print_ast_expr ppf i;
         fprintf ppf "]";
     )
