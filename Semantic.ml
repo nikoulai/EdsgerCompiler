@@ -59,11 +59,11 @@ let rec  getType expr = match expr with
             | _ -> (*Types.printType (getType x);Types.printType (getType y);*)error "Mod needs integer and integer" ; Tnone
             )
           | Tblss | Tbgrt | Tbleq | Tbgeq | Tbeq | Tbneq -> (match (getType x,getType y) with
-            | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool)  -> Tbool
+            | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool) | (Tchar ,Tchar)  -> Tbool
             | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c11" ;Tnone)
             | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c12" ;Tnone)
             | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c13" ;Tnone)
-            | _ ->error "sigkrisi xriazete arithmous";Tnone)
+            | _ ->error "Error in comparison";Tnone)
           | Tband | Tbor -> (match (getType x,getType y) with
             | (Tbool ,Tbool) ->Tbool
             | _ ->
