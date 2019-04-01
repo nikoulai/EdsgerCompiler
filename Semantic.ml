@@ -36,7 +36,7 @@ let rec  getType expr = match expr with
         |Eint _ -> Tint
         |Edoub _ -> Tdouble
         |Estr x ->Tarray(Tchar,String.length x)
-        |Enull -> Tnone
+        |Enull -> Tptr (Tnone)
 (*        |EPointer x -> Tptr (getType x)*)
         | Eunop (x, z) ->(match z with
           | Tuamp -> printf("Ampersand\n"); Tptr (getType x)
