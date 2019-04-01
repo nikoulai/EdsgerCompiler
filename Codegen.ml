@@ -188,9 +188,6 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
        let _ = match !env with
          | Global (_) -> let _ = List.iter (fun x -> match x with
                                                      | Ast.Decl(name,e) ->
-                                                     Printf.printf "??!";
-                                                     print_opt_expr e;
-                                                     Printf.printf "??!";
                                                      ignore(env := update_env name (!env))
                                                      (* | Ast.Complex_declarator(name, _) -> ignore(env := update_env name (!env)) *)
                                                      )
@@ -214,7 +211,7 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
                                   (* let malloc = build_alloca ( pointer_type typos ) name builder in *)
                                   (* let _ = Hashtbl.add named_values name malloc in *)
                                   (* let arr = build_array_malloc typos (code_gen_exp (e) ) "mallocttmp" builder in let arr = build_bitcast arr (pointer_type typos) "tmp" builder  in let _ = build_store arr malloc builder in malloc *)
-                                  ;()
+                                  (* ;() *)
                                   )
                                   | _ -> (
                                   let alloca = build_alloca typos name builder in
