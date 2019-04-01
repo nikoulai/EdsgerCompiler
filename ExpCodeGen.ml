@@ -506,12 +506,16 @@ let rec code_gen_exp exp =
 |Enew (t, Some e) -> let ty = findLltype t in
                        let ir = code_gen_exp e in
                        let ir = if is_pointer e then build_load ir "loadtmp" builder else ir in
-                       build_array_alloca (ty) ir "mallocarraytmp" builder
+                       let ir = build_array_alloca (ty) ir "mallocarraytmp" builder in
+                       build_pointercast ir ty "tmp" builder
 
 |Edel e ->
-  let ir = code_gen_exp e in
+(* const_null ( i1_type context) *)
+ build_free (build_load ( (get_identifier e )) "tmp" builder) builder
+
+  (* let ir = code_gen_exp e in
   let _ = Printf.printf("del\n") in
-  build_free ir builder
+  build_free ir builder *)
 
 | Enull ->build_add (default_val_type Tint) (default_val_type Tint) "tmp" builder
 
