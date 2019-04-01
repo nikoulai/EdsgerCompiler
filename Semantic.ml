@@ -30,30 +30,32 @@ let  getEntryType entr = match entr.entry_info with
 |ENTRY_temporary x -> x.temporary_type
 
 let rec  getType expr = match expr with
-        |Eid x ->  getEntryType (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true) (*add some warning message*)
+        | Eid x ->  getEntryType (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true) (*add some warning message*)
         |Ebool _ -> Tbool
         |Echar _ -> Tchar
         |Eint _ -> Tint
         |Edoub _ -> Tdouble
         |Estr x ->Tarray(Tchar,String.length x)
-        |Enull -> Tptr (Tnone)
+        |Enull -> Tnone
 (*        |EPointer x -> Tptr (getType x)*)
-        | Eunop (x, z) ->(match z with
-          | Tuamp -> printf("Ampersand\n"); Tptr (getType x)
-          | Tutim -> printf("Dereference\n");(*  print_expr_t (getType x); *)
-                     (match (getType x) with
-                      Tptr y -> y
-                      | Tarray (y, a)  -> y
-                      | _ -> error "Dereferencing a non pointer"; Tnone)
+        | Eunop (x, z) -> (match z with
+          | Tuamp -> Tptr (getType x)
           | _ -> getType x
           )
         | Eunas (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with
           |Tptr a -> Tptr a
           |_->  (error "++ -- needs integer"; Tnone) )
-        | Eunas1 (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with
-          |Tptr a -> Tptr a
-          |_->  (error "++ -- needs integer"; Tnone) )
         | Ebop (x,y,z) -> (match z with
+          | Tbpl ->if (y==Enull || x == Enull) then (error "Error in sum";Tnone)else  (match (getType x,getType y) with | (Tptr x1,Tint) -> Tptr x1
+            | (Tint,x1) -> x1
+            | (x1,Tint) ->x1
+            | (Tdouble,x1) ->Tdouble
+            | (x1,Tdouble) ->Tdouble
+            | (Tchar,x1) ->Tchar
+            | (x1,Tchar) ->Tchar
+            | _ -> error "Type problem";Tnone (*I shall add something for char + char etc*)
+            )
+
           | Tbmod -> (match (getType x,getType y) with
             | (Tint,Tint) ->  Tint
             | (Tptr (Tint),Tint) -> Tint
@@ -62,16 +64,14 @@ let rec  getType expr = match expr with
             | _ -> (*Types.printType (getType x);Types.printType (getType y);*)error "Mod needs integer and integer" ; Tnone
             )
           | Tblss | Tbgrt | Tbleq | Tbgeq | Tbeq | Tbneq -> (match (getType x,getType y) with
-            | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool) | (Tchar ,Tchar)  -> Tbool
+            | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool)  -> Tbool
             | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c11" ;Tnone)
             | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c12" ;Tnone)
             | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c13" ;Tnone)
-            | _ ->error "Error in comparison";Tnone)
+            | _ ->error "sigkrisi xriazete arithmous";Tnone)
           | Tband | Tbor -> (match (getType x,getType y) with
             | (Tbool ,Tbool) ->Tbool
-            | _ ->
-             (* printType (getType x); printType (getType y); *)
-            error "type missimatch on boolean action" ; Tnone )
+            | _ -> printType (getType x); printType (getType y);error "type missimatch on boolean action" ; Tnone )
           | Tbcom -> getType y
           | _ -> (match (getType x,getType y) with | (Tptr x1,Tint) -> Tptr x1
             | (Tint,x1) -> x1
@@ -98,31 +98,13 @@ let rec  getType expr = match expr with
             )
           )
         | Ecast (x,y) -> if castAllow x (getType y) then x else getType y
-        | Eif (x,y,z)->
-        if (getType x = Tbool)
-          then (if equalType (getType y) (getType z)
-            then getType y 
-            else (error "question type1"; Tnone ))
-          else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
+        | Eif (x,y,z)-> if (getType x = Tbool) then (if equalType (getType y) (getType z) then getType y else (error "question type1"; Tnone )) else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
         | Enew (x,_) -> x
         | Edel _ -> Tnone
         | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)
         | Eapp (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result
         | _ -> Tnone
-(*  and print_expr_t e =
-(*    Printf.printf "What?\n";
- *)    Printf.printf  (  match e with
-                | Tnone  _ -> "Tnone"
-               | Tint _ -> "Tint"
-               | Tchar _  -> "Tchar"
-               | Tbool _  -> "Tbool"
-               | Tdouble  _ -> "Tdouble"
-               | Tptr  _ -> "Tptr"
-               | Tarray  _  -> "Tarray"
-               | Tvoid  _ -> "Tvoid"
-
-                      );
- *)and  castAllow x y = match (x,  y) with
+and  castAllow x y = match (x,  y) with
 | (Tdouble ,Tint)| (Tint,Tdouble) -> true
 | (Tbool ,_) -> true
 | (Tchar ,Tint) -> true
@@ -268,7 +250,6 @@ and check_statement stm =
      check_fun_type (typos) (Tvoid))
     | Some expr ->
        ignore (check_fun_type (!currentScope.sco_type) (getType expr)));
-| Snull -> ()
 (* ignore(Symbtest.printSymbolTable());    *)
 
 and check_fun_type scope_typ typ =
@@ -292,6 +273,7 @@ and check_main () =
   let suffix = List.map (fun x -> match x with | Param (t,_) -> convert_tto_char t | ParamByRef (t,_) -> convert_tto_char t) param_list in String.concat "" suffix
 *)
 and print_expr e =
+Printf.printf "\n!!\n";
  Printf.printf  (  match e with
                     Eid _  -> "Eid"
                     | Ebool _  -> "Ebool"
