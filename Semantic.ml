@@ -30,7 +30,7 @@ let  getEntryType entr = match entr.entry_info with
 |ENTRY_temporary x -> x.temporary_type
 
 let rec  getType expr = match expr with
-        | Eid x ->  getEntryType (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true) (*add some warning message*)
+        |Eid x ->  getEntryType (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true) (*add some warning message*)
         |Ebool _ -> Tbool
         |Echar _ -> Tchar
         |Eint _ -> Tint
@@ -40,7 +40,7 @@ let rec  getType expr = match expr with
 (*        |EPointer x -> Tptr (getType x)*)
         | Eunop (x, z) ->(match z with
           | Tuamp -> printf("Ampersand\n"); Tptr (getType x)
-          | Tutim -> printf("Dereference\n"); print_expr_t (getType x);
+          | Tutim -> printf("Dereference\n");(*  print_expr_t (getType x); *)
                      (match (getType x) with
                       Tptr y -> y
                       | Tarray (y, a)  -> y
@@ -48,6 +48,9 @@ let rec  getType expr = match expr with
           | _ -> getType x
           )
         | Eunas (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with
+          |Tptr a -> Tptr a
+          |_->  (error "++ -- needs integer"; Tnone) )
+        | Eunas1 (x,_) -> if (getType x) = Tint then Tint else (match (getType x) with
           |Tptr a -> Tptr a
           |_->  (error "++ -- needs integer"; Tnone) )
         | Ebop (x,y,z) -> (match z with
@@ -106,9 +109,9 @@ let rec  getType expr = match expr with
         | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)
         | Eapp (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result
         | _ -> Tnone
- and print_expr_t e =
-   Printf.printf "What?\n";
-    Printf.printf  (  match e with
+(*  and print_expr_t e =
+(*    Printf.printf "What?\n";
+ *)    Printf.printf  (  match e with
                 | Tnone  _ -> "Tnone"
                | Tint _ -> "Tint"
                | Tchar _  -> "Tchar"
@@ -119,7 +122,7 @@ let rec  getType expr = match expr with
                | Tvoid  _ -> "Tvoid"
 
                       );
-and  castAllow x y = match (x,  y) with
+ *)and  castAllow x y = match (x,  y) with
 | (Tdouble ,Tint)| (Tint,Tdouble) -> true
 | (Tbool ,_) -> true
 | (Tchar ,Tint) -> true
@@ -289,7 +292,6 @@ and check_main () =
   let suffix = List.map (fun x -> match x with | Param (t,_) -> convert_tto_char t | ParamByRef (t,_) -> convert_tto_char t) param_list in String.concat "" suffix
 *)
 and print_expr e =
-Printf.printf "\n!!\n";
  Printf.printf  (  match e with
                     Eid _  -> "Eid"
                     | Ebool _  -> "Ebool"

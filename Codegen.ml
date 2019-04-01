@@ -189,9 +189,9 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
        let _ = match !env with
          | Global (_) -> let _ = List.iter (fun x -> match x with
                                                      | Ast.Decl(name,e) ->
-                                                     Printf.printf "??";
+                                                     Printf.printf "??!";
                                                      print_opt_expr e;
-                                                     Printf.printf "??";
+                                                     Printf.printf "??!";
                                                      ignore(env := update_env name (!env))
                                                      (* | Ast.Complex_declarator(name, _) -> ignore(env := update_env name (!env)) *)
                                                      )
@@ -561,8 +561,8 @@ and print_expr e =
                    | Eif _  -> "Eif"
 
                    );
-  Printf.printf "!!!"
-  and print_opt_expr e =(
+(*   Printf.printf "!!!"
+ *)  and print_opt_expr e =(
     match e with
     | Some ex-> ()
     | _ -> ()

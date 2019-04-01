@@ -320,11 +320,11 @@ and print_ast_expr ppf ast =
     fprintf ppf "DELETE ";
     print_ast_expr ppf expr;
   | Emat (expr1, expr2) ->
-  fprintf ppf " Emat";
+  fprintf ppf "( Emat";
     print_ast_expr ppf expr1;
-    fprintf ppf "1[1";
+    fprintf ppf "[";
     print_ast_expr ppf expr2;
-    fprintf ppf "] ";
+    fprintf ppf "] ) ";
   | Eif (expr1, expr2, expr3) ->
   fprintf ppf "Eif ";
     print_ast_expr ppf expr1;

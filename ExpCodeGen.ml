@@ -130,7 +130,7 @@ and get_env_params_types env global_decs =
         try Hashtbl.find named_values name
         with Not_found -> raise Not_found
       in (type_of v)
-    with Not_found ->  find_type_from_global name global_decs
+    with Not_found ->Printf.printf "ONLY LOOKING IN G";  find_type_from_global name global_decs
   in
   List.map find_type env
 
@@ -219,7 +219,8 @@ let rec code_gen_exp exp =
                 ) args
    in
    build_call callee args tmp builder
-| Emat (e1, e2) -> let pointer = code_gen_exp e1 in
+| Emat (e1, e2) -> Printf.printf"Emat\n";
+                    let pointer = code_gen_exp e1 in
                     let act_array = build_load pointer "act_ar" builder in
                     let index = code_gen_exp e2 in
                     let index = if (is_pointer e2) then build_load index "tmpindex" builder
@@ -264,10 +265,21 @@ let rec code_gen_exp exp =
                                | Tbdiv ->  if(is_double ir1) then build_fdiv ir1 ir2 "fdivtmp" builder
                                          else build_sdiv ir1 ir2 "sdivtmp" builder
                                | Tbmod -> build_srem ir1 ir2 "sremtmp" builder
-                               | Tbeq ->     build_icmp Llvm.Icmp.Eq ir1 ir2 "icmpeqtmp" builder
-                               | Tbneq -> if (e1 = Estr "NULL") then build_is_null ir2 "is_null" builder
-                                         else if (e2 = Estr "NULL") then build_is_null ir1 "is_null" builder
-                                         else if ((e1 = Estr "NULL") && (e2 = Estr "NULL")) then code_gen_exp (Ebool false)
+                               | Tbeq -> if (e1 = Enull) then build_is_null ir2 "is_null" builder
+                                         else if (e2 = Enull) then build_is_null ir1 "is_null" builder
+                                         else if ((e1 = Enull) && (e2 = Enull)) then code_gen_exp (Ebool tr)
+                                         else
+                                           if(is_double ir1) then build_fcmp Llvm.Fcmp.One ir1 ir2 "icmpeqtmp" builder
+                                           else
+                                             let ir1 = if(is_op_with_pointer ir1) then build_ptrtoint ir1 (int_type) "ptrtoint" builder
+                                                       else ir1 in
+                                             let ir2 = if (is_op_with_pointer ir2) then build_ptrtoint ir2 (int_type) "ptrtoint" builder
+                                                       else ir2 in
+                                             build_icmp Llvm.Icmp.Eq ir1 ir2 "icmpeqtmp" builder
+                                   (* build_icmp Llvm.Icmp.Eq ir1 ir2 "icmpeqtmp" builder *)
+                               | Tbneq -> if (e1 = Enull) then build_is_null ir2 "is_null" builder
+                                         else if (e2 = Enull) then build_is_null ir1 "is_null" builder
+                                         else if ((e1 = Enull) && (e2 = Enull)) then code_gen_exp (Ebool false)
                                          else
                                            if(is_double ir1) then build_fcmp Llvm.Fcmp.One ir1 ir2 "icmpeqtmp" builder
                                            else
@@ -312,8 +324,6 @@ let rec code_gen_exp exp =
                                | _ -> (Error.error "%s: Unkown binary operator while producing IR" ("") ;const_null int_type)
                               )
                             )
-
-
 |Eunas (e,op) ->
   let ir = code_gen_exp e in
   (match op with
@@ -329,9 +339,8 @@ let rec code_gen_exp exp =
       let exp = code_gen_exp expr in
       let _ = build_store exp ir builder in
       exp
-   | _ -> Error.error "%s: Don't know what to do with prefix operator:" ""; const_null int_type
+   | _ -> Error.error "%s: Invalid prefix operator:" ""; const_null int_type
   )
-
 |Eunas1 (e, op) ->
   let ir = code_gen_exp e in
   (match op with
@@ -352,7 +361,7 @@ let rec code_gen_exp exp =
              let add = code_gen_exp adde in
              add
 
-   | _ -> Error.error "%s: Don't know what to do with prefix operator:" ""; const_null int_type
+   | _ -> Error.error "%s: Invalid postfix operator:" ""; const_null int_type
   )
 
 |Ebas (e1,e2, op) ->
@@ -382,7 +391,7 @@ let rec code_gen_exp exp =
           let lhs = code_gen_exp e1 in
           let _ = build_store rhs lhs builder in
           lhs
-       | Estr "NULL"-> let lhs = code_gen_exp e1 in
+       | Enull-> let lhs = code_gen_exp e1 in
                          let lhs4del = build_load lhs "loadforNull" builder in
                          let ty = type_of lhs4del in
                          delete_instruction lhs4del;
@@ -501,6 +510,7 @@ let rec code_gen_exp exp =
 
 |Edel e ->
   let ir = code_gen_exp e in
+  let _ = Printf.printf("del\n") in
   build_free ir builder
 
 | Enull ->build_add (default_val_type Tint) (default_val_type Tint) "tmp" builder
@@ -532,7 +542,8 @@ and bool_to_int n =
   | false -> 0
   | true -> 1
 
-and is_pointer ex =let _=Printf.printf  (  match ex with
+and is_pointer ex =let _ = Printf.printf("is_pointer\n") in
+  let _=Printf.printf  (  match ex with
                     Eid   _-> "Eid"
                    | Ebool  _-> "Ebool"
                    | Enull _-> "Enull"
@@ -541,7 +552,7 @@ and is_pointer ex =let _=Printf.printf  (  match ex with
                    | Edoub  _-> "Edoub"
                    | Estr  _-> "Estr"
                    | Eapp  _-> "Eapp"
-                   | Eunop _-> "Eunop!!"
+                   | Eunop _-> "Eunop"
                    | Eunas _-> "Eunas"
                    | Eunas1 _-> "Eunas1"
                    | Ebop  _-> "Ebop"
@@ -624,13 +635,13 @@ and  ltype_of_type = function
         | Tptr t -> pointer_type (ltype_of_type t)
         | Tarray (a,b) ->array_type (ltype_of_type a) b
         | Tnone -> ltype_of_type Tvoid
-and getAddress expr =  match expr with
+and getAddress expr =  Printf.printf "getAddress\n"; match expr with
  Eid(x) ->  Hashtbl.find named_values  x
  (* | Ebas(a,b,c) ->Printf.printf "d---f";code_gen_exp(Ebas(a,b,c)); code_gen_exp b *)
  | Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
          let tmp_val =  build_load (get_identifier x ) "tmp" builder in
          let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
- | e -> Printf.printf "Nikakios"; print_expr e; code_gen_exp e
+ | e -> Printf.printf "getAddress!\n"; print_expr e; code_gen_exp e
  (* const_null ( i1_type context) *)
  (* | e -> (
    match e with
@@ -648,7 +659,7 @@ and get_identifier s = match s with
 
 
         and print_expr e =
-        Printf.printf "\n!!\n";
+        Printf.printf "get_identifier\n";
          Printf.printf  (  match e with
                             Eid _  -> "Eid"
                             | Ebool _  -> "Ebool"
