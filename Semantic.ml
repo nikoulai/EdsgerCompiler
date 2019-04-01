@@ -63,6 +63,7 @@ let rec  getType expr = match expr with
             )
           | Tblss | Tbgrt | Tbleq | Tbgeq | Tbeq | Tbneq -> (match (getType x,getType y) with
             | (Tint,Tint) | (Tint,Tdouble) | (Tdouble,Tint) | (Tdouble ,Tdouble) | (Tbool ,Tbool) | (Tchar ,Tchar)  -> Tbool
+            | (Tptr _,Tptr Tnone) | (Tptr Tnone, Tptr _) -> Tbool
             | (Tarray (x,_), Tarray (y,_) ) | (Tptr x,Tptr y)-> if equalType x y then Tbool else (error "from c11" ;Tnone)
             | (Tarray (x,_), y) | (Tptr x,y)-> if equalType x y then Tbool else (error "from c12" ;Tnone)
             | (y,Tarray (x,_)) | (y,Tptr x)-> if equalType x y then Tbool else (error "from c13" ;Tnone)
