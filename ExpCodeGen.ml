@@ -267,7 +267,7 @@ let rec code_gen_exp exp =
                                | Tbmod -> build_srem ir1 ir2 "sremtmp" builder
                                | Tbeq -> if (e1 = Enull) then build_is_null ir2 "is_null" builder
                                          else if (e2 = Enull) then build_is_null ir1 "is_null" builder
-                                         else if ((e1 = Enull) && (e2 = Enull)) then code_gen_exp (Ebool tr)
+                                         else if ((e1 = Enull) && (e2 = Enull)) then code_gen_exp (Ebool true)
                                          else
                                            if(is_double ir1) then build_fcmp Llvm.Fcmp.One ir1 ir2 "icmpeqtmp" builder
                                            else

@@ -117,7 +117,6 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
     | [Ast.Sreturn _] -> true
     | _::tail -> is_return_last_instuction tail
 
-  (* HAVE TO CHANGE IT TO UNIT *)
   let rec codegen_main prog =
     let _ = codegen_lib() in
     match prog with
@@ -206,9 +205,15 @@ let global_decs : (Ast.ast_declaration) list ref = ref []
                                   match ex with
                                   | Some e->(
                                      (* print_expr e; *)
-                                  let malloc = build_alloca ( pointer_type typos ) name builder in
-                                  let _ = Hashtbl.add named_values name malloc in
-                                  let arr = build_array_malloc typos (code_gen_exp (e) ) "mallocttmp" builder in let arr = build_bitcast arr (pointer_type typos) "tmp" builder  in let _ = build_store arr malloc builder in malloc
+                                  let leng = code_gen_exp e in
+                                  let decl = build_alloca (pointer_type typos) name builder in
+                                  let alloca = build_array_malloc (typos) leng "allocatmp" builder in
+                                  let _ = build_store alloca decl builder in 
+                                  Hashtbl.add named_values name decl;
+                                  env := update_env name !env
+                                  (* let malloc = build_alloca ( pointer_type typos ) name builder in *)
+                                  (* let _ = Hashtbl.add named_values name malloc in *)
+                                  (* let arr = build_array_malloc typos (code_gen_exp (e) ) "mallocttmp" builder in let arr = build_bitcast arr (pointer_type typos) "tmp" builder  in let _ = build_store arr malloc builder in malloc *)
                                   ;()
                                   )
                                   | _ -> (
