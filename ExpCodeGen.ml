@@ -231,7 +231,7 @@ let rec code_gen_exp exp =
 | Eunop (e,op) -> (match op with
                       |  Tuamp->
                         Printf.printf"Ampersand\n"; code_gen_exp e
-                      | Tutim -> 
+                      | Tutim ->
                        Printf.printf"Dereferencing\n";
                        (let exp_ir = code_gen_exp e in
                             let tmp_ir = build_load exp_ir "loadtmp" builder in
@@ -407,14 +407,14 @@ let rec code_gen_exp exp =
           let _ = build_store rhs lhs builder in
           lhs
           | Eunop (expr, Tutim) ->
-          let rhs = code_gen_exp e2 in 
+          let rhs = code_gen_exp e2 in
           let rhs =  build_load rhs "tmp" builder in
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
           lhs
 
           | _ ->
-          let rhs = code_gen_exp e2 in 
+          let rhs = code_gen_exp e2 in
           let rhs = if(need_def e2) then build_load rhs "tmp" builder else rhs in
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
@@ -503,11 +503,14 @@ let rec code_gen_exp exp =
 |Enew (t, None) -> let ty = findLltype t in
                      build_malloc (ty) "malloctmp" builder
 
-|Enew (t, Some e) -> let ty = findLltype t in
-                       let ir = code_gen_exp e in
-                       let ir = if is_pointer e then build_load ir "loadtmp" builder else ir in
-                       let ir = build_array_alloca (ty) ir "mallocarraytmp" builder in
-                       build_pointercast ir ty "tmp" builder
+|Enew (t, Some e) ->
+        let y = code_gen_exp e in
+        let size_t = if(need_def e) then build_load ( code_gen_exp e) "tmp" builder else ( code_gen_exp e) in
+        (* let size_t = myderef e in *)
+        let t = (ltype_of_type t) in
+        let arra = build_array_malloc  t size_t "tmp" builder in
+         build_pointercast arra (pointer_type t) "tmp" builder
+
 
 |Edel e ->
 (* const_null ( i1_type context) *)
