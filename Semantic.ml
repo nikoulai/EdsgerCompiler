@@ -54,6 +54,15 @@ let rec  getType expr = match expr with
           |Tptr a -> Tptr a
           |_->  (error "++ -- needs integer"; Tnone) )
         | Ebop (x,y,z) -> (match z with
+          | Tbpl ->if (y==Enull || x == Enull) then (error "Error in sum";Tnone)else  (match (getType x,getType y) with | (Tptr x1,Tint) -> Tptr x1
+            | (Tint,x1) -> x1
+            | (x1,Tint) ->x1
+            | (Tdouble,x1) ->Tdouble
+            | (x1,Tdouble) ->Tdouble
+            | (Tchar,x1) ->Tchar
+            | (x1,Tchar) ->Tchar
+            | _ -> error "Type problem";Tnone (*I shall add something for char + char etc*)
+            )
           | Tbmod -> (match (getType x,getType y) with
             | (Tint,Tint) ->  Tint
             | (Tptr (Tint),Tint) -> Tint
@@ -102,7 +111,7 @@ let rec  getType expr = match expr with
         | Eif (x,y,z)->
         if (getType x = Tbool)
           then (if equalType (getType y) (getType z)
-            then getType y 
+            then getType y
             else (error "question type1"; Tnone ))
           else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
         | Enew (x,_) -> x
