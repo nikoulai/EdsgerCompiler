@@ -219,7 +219,7 @@ let rec code_gen_exp exp =
                 ) args
    in
    build_call callee args tmp builder
-| Emat (e1, e2) -> Printf.printf"Emat\n";
+| Emat (e1, e2) ->
                     let pointer = code_gen_exp e1 in
                     let act_array = build_load pointer "act_ar" builder in
                     let index = code_gen_exp e2 in
@@ -230,12 +230,15 @@ let rec code_gen_exp exp =
                     ir
 | Eunop (e,op) -> (match op with
                       |  Tuamp->
-                        Printf.printf"Ampersand\n"; code_gen_exp e
+                         code_gen_exp e
                       | Tutim ->
-                       Printf.printf"Dereferencing\n";
+
                        (let exp_ir = code_gen_exp e in
                             let tmp_ir = build_load exp_ir "loadtmp" builder in
-                            tmp_ir)
+                            let ty = type_of tmp_ir in
+                            (* if (is_op_with_pointer tmp_ir ) then tmp_ir else build_trunc_or_bitcast tmp_ir (pointer_type ty) "castingtmp" builder *)
+                            tmp_ir
+                            )
                       | Tumin -> let expr = Ebop(Eint 0, e ,Tbmin) in
                                code_gen_exp expr
                       | Tupl -> code_gen_exp e
@@ -520,7 +523,7 @@ let rec code_gen_exp exp =
   let _ = Printf.printf("del\n") in
   build_free ir builder *)
 
-| Enull ->build_add (default_val_type Tint) (default_val_type Tint) "tmp" builder
+| Enull -> const_pointer_null (pointer_type char_type)
 
 (* | e ->raise (Terrror ("uknow", e)) *)
 
@@ -549,7 +552,8 @@ and bool_to_int n =
   | false -> 0
   | true -> 1
 
-and is_pointer ex =let _ = Printf.printf("is_pointer\n") in
+and is_pointer ex =
+(* let _ = Printf.printf("is_pointer\n") in
   let _=Printf.printf  (  match ex with
                     Eid   _-> "Eid"
                    | Ebool  _-> "Ebool"
@@ -569,7 +573,7 @@ and is_pointer ex =let _ = Printf.printf("is_pointer\n") in
                    | Edel _-> "Edel"
                    | Emat _-> "Emat"
                    | Eif  _-> "Eif"
-                   )in
+                   )in *)
   match ex with
   | Eid _ -> true
   | Emat _ -> true
@@ -642,13 +646,18 @@ and  ltype_of_type = function
         | Tptr t -> pointer_type (ltype_of_type t)
         | Tarray (a,b) ->array_type (ltype_of_type a) b
         | Tnone -> ltype_of_type Tvoid
-and getAddress expr =  Printf.printf "getAddress\n"; match expr with
+and getAddress expr =
+ (* Printf.printf "getAddress\n"; *)
+ match expr with
  Eid(x) ->  Hashtbl.find named_values  x
  (* | Ebas(a,b,c) ->Printf.printf "d---f";code_gen_exp(Ebas(a,b,c)); code_gen_exp b *)
  | Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
          let tmp_val =  build_load (get_identifier x ) "tmp" builder in
          let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
- | e -> Printf.printf "getAddress!\n"; print_expr e; code_gen_exp e
+ | e ->
+  (* Printf.printf "getAddress!\n"; *)
+  (* print_expr e;  *)
+  code_gen_exp e
  (* const_null ( i1_type context) *)
  (* | e -> (
    match e with
