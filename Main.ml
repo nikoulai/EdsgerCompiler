@@ -21,7 +21,7 @@ let main =
   ( match name with
     | None ->  (raise (Error "wrong type source file given"))
     | Some name ->(
-       Printf.printf "\n\n%s\n\n" name;
+       (* Printf.printf "\n\n%s\n\n" name; *)
              let filename = String.sub name 0 ((String.length name) - 4 ) in (*remove .eds*)
        (open_in name,filename)
 

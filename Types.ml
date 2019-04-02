@@ -18,7 +18,7 @@ let rec sizeOfType t =
    | _                   -> 0
 
 let rec equalType t1 t2 =
-   Printf.printf "comparetypes";print_expr t1;print_expr t2;
+   (* Printf.printf "comparetypes";print_expr t1;print_expr t2; *)
    match t1, t2 with
    | Tarray (et1, sz1), Tarray (et2, sz2) -> equalType et1 et2
    | Tptr Tnone, Tptr et2                 -> true

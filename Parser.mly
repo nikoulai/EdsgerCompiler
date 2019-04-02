@@ -94,14 +94,14 @@ open Lexing
 %nonassoc ELSE
 /* ------------*/
 %left COMMA
-%nonassoc OPOP 
+%nonassoc OPOP
 %nonassoc TtypeaS /*for typea_t shift/reduce conflict */
 
 %right ASSIGNMENT
 %nonassoc Q_MARK
 %right COMPIF
 %left OR
-%left AND 
+%left AND
 %left LESS GREATER EQUAL N_EQUAL LESS_EQ GREAT_EQ
 %left LOPERATOR /* all binary_operators for shift/reduce*/
 %right	ASSIGN  ASSIGN_TIMES  ASSIGN_DIV  ASSIGN_MOD ASSIGN_ADD
@@ -111,7 +111,7 @@ open Lexing
 %nonassoc PPLUS MMINUS
 %nonassoc NEW DELETE
 %nonassoc UNOP
-%nonassoc LPAREN RPAREN /*see http://caml.inria.fr/pub/docs/manual-ocaml-4.00/manual026.html how conflicts are resolved */
+%nonassoc LPAREN RPAREN
 %nonassoc POSTFIX
 %nonassoc PREFIX
 %nonassoc APP

@@ -46,7 +46,7 @@ rule e_lang = parse
 | digit+ '.' digit+ (('e'|'E') ('+'|'-')? (digit+))? as fnum
 { DOUBLE_NUM (float_of_string fnum) }
 
- | '\'' [^ '\\' '\"' '\''] '\'' as character  
+ | '\'' [^ '\\' '\"' '\''] '\'' as character
  | '\'' escape_char '\'' as character
    		    { let c = Str.global_replace (Str.regexp "\\\\n") "\n" character in
 		      let c = Str.global_replace (Str.regexp "\\\\t") "\t" c in
@@ -54,22 +54,16 @@ rule e_lang = parse
 		      let c = Str.global_replace (Str.regexp "\\\\0") "\000" c in
       	CHAR_V(c.[1])
               }
- | '\"' ([^ '\n' '\t' '\r' '\"']| escape_char)* '\"' as string (*na to doume xana*)
-                                 {
+ | '\"' ([^ '\n' '\t' '\r' '\"']| escape_char)* '\"' as string                                  {
 			   STRING  (	let s = Str.global_replace (Str.regexp "\\\\n") "\n" string in
 				       	let s = Str.global_replace (Str.regexp "\\\\t") "\t" s in
 				       	let s = Str.global_replace (Str.regexp "\\\\r") "\r" s in
 				       	let s = Str.global_replace (Str.regexp "\\\\\"") "\"" s in
-					String.sub s 1 ((String.length s)-2) 
+					String.sub s 1 ((String.length s)-2)
 					 ) }
 
 | "#include"
-(*{
-	Printf.printf "include\n";
-	e_lang lexbuf
-}*)
 {
-	Printf.printf "include\n";
 	INCLUDE
 
 }
@@ -139,13 +133,9 @@ rule e_lang = parse
   c pos.pos_lnum (pos.pos_cnum - pos.pos_bol);
   raise Not_found
   }
-(*{
-	Printf.printf "Unrecognized character: %c\n" c;
-}*)
 
 | eof
 {
-	Printf.printf "EOF\n";
 	EOF;
 }
 
