@@ -39,7 +39,7 @@ let rec  getType expr = match expr with
         |Enull -> Tptr (Tnone)
 (*        |EPointer x -> Tptr (getType x)*)
         | Eunop (x, z) ->(match z with
-          | Tuamp -> printf("Ampersand\n"); Tptr (getType x)
+          | Tuamp -> Tptr (getType x)
           | Tutim ->
           (* printf("Dereference\n");(*  print_expr_t (getType x); *) *)
                      (match (getType x) with

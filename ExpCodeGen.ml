@@ -104,14 +104,12 @@ and get_env_params_types env global_decs =
   let has_name_in_dec name dec =
     match dec with
     |Ast.Decl(n,_) -> (name = n)
-
   in
   let has_name_in_var_dec name element =
     match element with
     |Ast.Vardecl(ty,decl) -> (try ignore(List.find (has_name_in_dec name) decl); true
                                    with Not_found -> false)
     |_ -> raise Not_found
-
   in
   let find_type_from_global name gl =
     let dec = List.find (has_name_in_var_dec name) gl
@@ -119,9 +117,12 @@ and get_env_params_types env global_decs =
        | Ast.Vardecl(ty,l) -> (let wanted = List.find (has_name_in_dec name) l in
                                     let ty = findLltype ty in
                                     match wanted with
-                                    |Ast.Decl _ -> pointer_type ty
-
+                                    | Ast.Decl(name,ex) -> (* Printf.printf "Decla!\n"; *)
+                                    (match ex with
+                                      | Some e -> (* Printf.printf "Pointer!\n"; *) pointer_type (pointer_type ty)
+                                      | None -> (* Printf.printf "None!\n"; *) pointer_type ty
                                     )
+                              )
        | _ -> Printf.printf "unexpected type"; int_type
   in
   let find_type name =
@@ -130,11 +131,18 @@ and get_env_params_types env global_decs =
         try Hashtbl.find named_values name
         with Not_found -> raise Not_found
       in (type_of v)
-    with Not_found ->Printf.printf "ONLY LOOKING IN G";  find_type_from_global name global_decs
+    with Not_found -> (* Printf.printf "Globals"; *)  find_type_from_global name global_decs
   in
   List.map find_type env
 
-
+(* and get_env_params_types env =
+  let find_type name =
+      let v =
+        try Hashtbl.find named_values name
+        with Not_found -> print_string(name); raise Not_found
+      in (type_of v)
+  in List.map find_type env
+ *)
 
 and env_to_list env =
   SS.elements (env_to_set env)
@@ -282,8 +290,8 @@ let rec code_gen_exp exp =
                                          else if (is_op_with_pointer ir2) then code_gen_exp (Emat(e2,e1))
                                          else build_add ir1 ir2 "addtmp" builder
                                | Tbmin ->  if(is_double ir1) then build_fsub ir1 ir2 "fsubtmp" builder
-                                         else if (is_op_with_pointer ir1) then code_gen_exp (Emat(e1,e2))
-                                         else if (is_op_with_pointer ir2) then code_gen_exp (Emat(e2,e1))
+                                         else if (is_op_with_pointer ir1) then code_gen_exp (Emat(e1,Eunop (e2, Tumin)))
+                                         else if (is_op_with_pointer ir2) then code_gen_exp (Emat(e2,Eunop (e1, Tumin)))
                                          else build_sub ir1 ir2 "subtmp" builder
                                | Tbtim ->  if(is_double ir1) then build_fmul ir1 ir2 "fmultmp" builder
                                          else build_mul ir1 ir2 "multmp" builder
@@ -392,7 +400,6 @@ let rec code_gen_exp exp =
 |Ebas (e1,e2, op) ->
   (match op with
    | Tba ->
-
       (match e2 with
        | Eunas1 (e, op) ->
           let rhs' = code_gen_exp e in
@@ -431,17 +438,19 @@ let rec code_gen_exp exp =
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
           lhs
-          | Eunop (expr, Tutim) ->
+      | Eunop (expr, Tutim) ->
           let rhs = code_gen_exp e2 in
           let rhs =  build_load rhs "tmp" builder in
           let lhs = getAddress e1 in
           let _ = build_store rhs lhs builder in
           lhs
 
-          | _ ->
+      | _ -> (* Printf.printf "wx..\n"; *)
           let rhs = code_gen_exp e2 in
           let rhs = if(need_def e2) then build_load rhs "tmp" builder else rhs in
           let lhs = getAddress e1 in
+          (* build_pointercast arra (pointer_type t) "tmp" builder *)
+          (* let lhs = if(is_op_with_pointer lhs) then (Printf.printf "opwp..\n"; build_inttoptr lhs (pointer_type (type_of lhs)) "inttoptr" builder) else lhs in *)
           let _ = build_store rhs lhs builder in
           lhs
       )
@@ -681,13 +690,21 @@ and getAddress expr =
            | Emat _ -> (getAddress x)
            | _ -> build_load (get_identifier x ) "tmp" builder) in
          let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
- | Eunop (x, Tuamp) ->  let y =  (get_identifier x) in
+ | Eunop (x, Tuamp) -> Printf.printf "SOS!\n"; let y =  (get_identifier x) in
         let dereference = build_struct_gep y 0 "tmp" builder in build_load dereference "tmp" builder
- | Eunop (x, Tutim) -> let y =  (get_identifier x) in
+ | Eunop (x, Tutim) ->
+(*         Printf.printf "shit...\n";
+ *)        (match x with
+                | Eid(a) -> (let y = Hashtbl.find named_values  a in
+                             let load_ = build_load y "temp" builder in 
+                             load_ ) 
+                | _ -> code_gen_exp x)
+(*         let y =  (get_identifier x) in
         let load_ = build_load y "temp" builder in 
         load_
- | e ->
-  (* Printf.printf "getAddress!\n"; *)
+ *) 
+  | e -> 
+  Printf.printf "getAddress problem!\n";
   (* print_expr e;  *)
   code_gen_exp e
 
