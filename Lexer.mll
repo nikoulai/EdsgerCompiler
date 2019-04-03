@@ -52,6 +52,7 @@ rule e_lang = parse
 		      let c = Str.global_replace (Str.regexp "\\\\t") "\t" c in
 		      let c = Str.global_replace (Str.regexp "\\\\r") "\r" c in
 		      let c = Str.global_replace (Str.regexp "\\\\0") "\000" c in
+			  let c = Str.global_replace (Str.regexp "\\\\\"") "\"" c in
       	CHAR_V(c.[1])
               }
  | '\"' ([^ '\n' '\t' '\r' '\"']| escape_char)* '\"' as string                                  {
@@ -59,6 +60,7 @@ rule e_lang = parse
 				       	let s = Str.global_replace (Str.regexp "\\\\t") "\t" s in
 				       	let s = Str.global_replace (Str.regexp "\\\\r") "\r" s in
 				       	let s = Str.global_replace (Str.regexp "\\\\\"") "\"" s in
+					    let s = Str.global_replace (Str.regexp "\\\\0") "\000" s in
 					String.sub s 1 ((String.length s)-2)
 					 ) }
 
