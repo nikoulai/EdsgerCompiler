@@ -687,7 +687,8 @@ and getAddress expr =
  | Emat(x,y) ->
           let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
           let tmp_val = (match x with
-           | Emat _ -> (getAddress x)
+           | Emat (Eid(a), y) -> build_load (get_identifier x ) "tmp" builder
+           | Emat _ -> (* Printf.printf "Double array!\n"; *) (getAddress x)
            | _ -> build_load (get_identifier x ) "tmp" builder) in
          let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
  | Eunop (x, Tuamp) -> Printf.printf "SOS!\n"; let y =  (get_identifier x) in
