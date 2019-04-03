@@ -219,7 +219,24 @@ let rec code_gen_exp exp =
                 ) args
    in
    build_call callee args tmp builder
-| Emat (e1, e2) ->
+| Emat (e1, e2) -> (match e1 with
+                   Estr str ->
+                    let act_array = build_global_stringptr str "strtmp" builder in
+                    let index = code_gen_exp e2 in
+                    let index = if (is_pointer e2) then build_load index "tmpindex" builder
+                                else index in
+                    let index = Array.of_list [index] in
+                    let ir = build_gep act_array index "arraytmp" builder in
+                    ir
+                  | Emat _ ->
+                    let act_array = code_gen_exp e1 in
+                    let index = code_gen_exp e2 in
+                    let index = if (is_pointer e2) then build_load index "tmpindex" builder
+                                else index in
+                    let index = Array.of_list [index] in
+                    let ir = build_gep act_array index "arraytmp" builder in
+                    ir
+                  | _ ->
                     let pointer = code_gen_exp e1 in
                     let act_array = build_load pointer "act_ar" builder in
                     let index = code_gen_exp e2 in
@@ -227,18 +244,20 @@ let rec code_gen_exp exp =
                                 else index in
                     let index = Array.of_list [index] in
                     let ir = build_gep act_array index "arraytmp" builder in
-                    ir
+                    ir)
 | Eunop (e,op) -> (match op with
                       |  Tuamp->
-                         code_gen_exp e
+                        (* Printf.printf"Ampersand\n"; code_gen_exp e *)
+                        (* Printf.printf"Ampersand\n";  *)
+                        (get_identifier e)
                       | Tutim ->
-
+                       (* Printf.printf"Dereferencing\n"; *)
+(*                        let tmp =  if(need_def e) then build_load ( code_gen_exp e) "tmp" builder else ( code_gen_exp e) in
+                       let load_ = (build_load tmp "tmp" builder) in
+                       load_ *)
                        (let exp_ir = code_gen_exp e in
                             let tmp_ir = build_load exp_ir "loadtmp" builder in
-                            let ty = type_of tmp_ir in
-                            (* if (is_op_with_pointer tmp_ir ) then tmp_ir else build_trunc_or_bitcast tmp_ir (pointer_type ty) "castingtmp" builder *)
-                            tmp_ir
-                            )
+                            tmp_ir)
                       | Tumin -> let expr = Ebop(Eint 0, e ,Tbmin) in
                                code_gen_exp expr
                       | Tupl -> code_gen_exp e
@@ -254,6 +273,9 @@ let rec code_gen_exp exp =
                                         else ir1 in
                               let ir2 = if (is_pointer e2) then build_load ir2 "loadtmp" builder
                                         else ir2 in
+(*                               let ir1 = if( (need_def e1)) then build_load ir1 "tmp" builder else ir1 in
+                              let ir2 = if(need_def e2) then build_load ir2 "tmp" builder else ir2 in
+ *)     
                               (match op with
                                | Tbpl ->  if(is_double ir1) then build_fadd ir1 ir2 "faddtmp" builder
                                          else if (is_op_with_pointer ir1) then code_gen_exp (Emat(e1,e2))
@@ -508,10 +530,9 @@ let rec code_gen_exp exp =
 
 |Enew (t, Some e) ->
         let y = code_gen_exp e in
-        let size_t = if(need_def e) then build_load ( code_gen_exp e) "tmp" builder else ( code_gen_exp e) in
-        (* let size_t = myderef e in *)
+        let y = if(need_def e) then build_load y "tmp" builder else y in
         let t = (ltype_of_type t) in
-        let arra = build_array_malloc  t size_t "tmp" builder in
+        let arra = build_array_malloc  t y "tmp" builder in
          build_pointercast arra (pointer_type t) "tmp" builder
 
 
@@ -577,9 +598,11 @@ and is_pointer ex =
   match ex with
   | Eid _ -> true
   | Emat _ -> true
-  | Eunop(e,Tutim)->true
- (*   | Ebop(e,_,_) -> is_pointer e
- *)  (* | Ast.Paren_expression(e) -> is_pointer e *)
+  | Eunop(e,Tutim) ->true
+(*   | Eunas (a,_) -> is_pointer a
+  | Eunas1 (a,_) -> is_pointer a
+ *) (*   | Ebop(e,_,_) -> is_pointer e*)
+  (* | Ast.Paren_expression(e) -> is_pointer e *)
   | _ ->  false
 
 and returnExpr a =
@@ -628,7 +651,8 @@ and is_double_pointer ir =
 and need_def = function
         | Eid _ -> true
         | Emat _ ->true
-        (* |(* Eplus (e1,_) | Ediv (e1,_) | Eminus (e1,_) | Emod (e1,_) | Emod (e1,_) | Emult (e1,_) | Eand (e1,_) | Eor (e1,_) | *)(*| EUnAdd e1 |EUnMinus e1 *) EPlusPlus (e1,_) | EMinusMinus (e1,_)  -> false *)
+(*         | Estr _ ->true
+ *)        (* |(* Eplus (e1,_) | Ediv (e1,_) | Eminus (e1,_) | Emod (e1,_) | Emod (e1,_) | Emult (e1,_) | Eand (e1,_) | Eor (e1,_) | *)(*| EUnAdd e1 |EUnMinus e1 *) EPlusPlus (e1,_) | EMinusMinus (e1,_)  -> false *)
         |  _->false
 and default_val_type smth =
         match smth with
@@ -638,7 +662,7 @@ and default_val_type smth =
         | Tdouble -> const_float (ltype_of_type smth) 0.0
         | Tvoid -> const_int (ltype_of_type smth) 0
 and  ltype_of_type = function
-        | Tint ->  i32_type context
+        | Tint ->  i16_type context
         | Tbool -> i1_type context
         | Tchar -> i8_type context
         | Tdouble ->x86fp80_type context
@@ -651,23 +675,21 @@ and getAddress expr =
  match expr with
  Eid(x) ->  Hashtbl.find named_values  x
  (* | Ebas(a,b,c) ->Printf.printf "d---f";code_gen_exp(Ebas(a,b,c)); code_gen_exp b *)
- | Emat(x,y) -> let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
-         let tmp_val =  build_load (get_identifier x ) "tmp" builder in
+ | Emat(x,y) ->
+          let index = code_gen_exp y in let index =  if(need_def y) then build_load index "tmp" builder else index in
+          let tmp_val = (match x with
+           | Emat _ -> (getAddress x)
+           | _ -> build_load (get_identifier x ) "tmp" builder) in
          let dereference = build_gep tmp_val  [|index|] "arrayval" builder in dereference
+ | Eunop (x, Tuamp) ->  let y =  (get_identifier x) in
+        let dereference = build_struct_gep y 0 "tmp" builder in build_load dereference "tmp" builder
+ | Eunop (x, Tutim) -> let y =  (get_identifier x) in
+        let load_ = build_load y "temp" builder in 
+        load_
  | e ->
   (* Printf.printf "getAddress!\n"; *)
   (* print_expr e;  *)
   code_gen_exp e
- (* const_null ( i1_type context) *)
- (* | e -> (
-   match e with
-   |Tuamp(x)->  let y =  (get_identifier x ) in
-          let dereference = build_struct_gep y 0 "tmp" builder in build_load dereference "tmp" builder
-   | v  ->
-    match v with
-   |Tptr(x)-> let y =  (get_identifier x ) in let load_ = build_load y "temp" builder in load_
-   )
- *)
 
 and get_identifier s = match s with
        Eid(a) ->Hashtbl.find named_values  a

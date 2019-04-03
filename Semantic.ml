@@ -117,7 +117,8 @@ let rec  getType expr = match expr with
           else (print_string ("aaa\n");  printType (getType x);error "type error questionmark"; Tnone)
         | Enew (x,_) -> x
         | Edel _ -> Tnone
-        | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone)
+        (* | Emat (x,y) -> if ((getType y) = Tint) then Tptr (exprArray x) else( error "type error array call" ; Tnone) *)
+        | Emat (x,y) -> Tptr (exprArray x) 
         | Eapp (x,_) -> if (check_name_lib x) then get_name_lib x else (get_entry_k (lookupEntry (id_make x) LOOKUP_ALL_SCOPES true)).function_result
         | _ -> Tnone
 (*  and print_expr_t e =

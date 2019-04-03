@@ -545,7 +545,7 @@ and print_expr e =
  Printf.printf  (  match e with
                     Eid _  -> "Eid"
                     | Ebool _  -> "Ebool"
-                    | Enull _ -> "Enull"
+                    | Enull -> "Enull"
                     | Eint _  -> "Eint"
                     | Echar _  -> "Echar"
                     | Edoub _  -> "Edoub"
