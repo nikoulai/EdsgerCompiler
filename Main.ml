@@ -14,7 +14,7 @@ let main =
   let f = List.exists (fun x -> x = "-f") argsl in
   let i = List.exists (fun x -> x = "-i") argsl in
   let ast = List.exists (fun x -> x = "-ast") argsl in
-  let name = List.find_opt (fun x -> Str.string_match (Str.regexp "[^.]*\.eds") x 0 ) argsl in
+  let name = List.find_opt (fun x -> Str.string_match (Str.regexp ".*eds") x 0 ) argsl in
   let (chan,name) =
 
   if (not i && not f) then

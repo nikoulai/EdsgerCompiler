@@ -2,11 +2,26 @@ Compilers - NTUA
 
 Implementation of compiler for Edsger programming language in OCaml, using ocamllex, ocamlyacc and LLVM.
 
-Compile:    make depend
-            make all
+Libraries: Go to folder libs/edsger_lib and run ./lib.sh to create lib.a (leave it there)
+
+Makefile options:    
+					make
+					make clean
+					make distclean
+					make pack
+					make count
+
+Run:
+		./Main.byte path/to/source.eds [-o] [-i] [-f] [-ast]
+		
+		-i: input in stdin and IR in stdout
+		-f: input in stdin and final code in stdout
+		-o: optimizations
+		-ast: print ast tree in compilation
+
+Outputs: path/to/{source,source.imm,source.asm}
 
 
-            ocamlbuild   -r -use-ocamlfind Main.byte -package llvm -pkgs str
 Authors:
-Nikos Iliakis
-Aspa Skalidi
+	Nikos Iliakis
+	Aspa Skalidi

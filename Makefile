@@ -1,14 +1,15 @@
 .PHONY: clean distclean pack count
 
-SRCFILES=Makefile extend.ml Lexer.mll Parser.mly Semantic.ml Codegen.ml ExpCodeGen.ml \
-  $(filter-out Parser.% Lexer.%,$(MLFILES)) \
-  $(filter-out Parser.%,$(MLIFILES))
+SRCFILES=Ast.ml Error.ml Error.mli Hashcons.ml Hashcons.mli Main.ml Symbol.ml Symbol.mli Types.ml Types.mli \
+Codegen.ml extend.ml Identifier.ml Identifier.mli Semantic.ml Symbtest.ml Makefile Lexer.mll Parser.mly README libs \
+ $(filter-out Parser.% Lexer.%,$(MLFILES)) \
+ $(filter-out Parser.%,$(MLIFILES))
 
 default:
-	ocamlbuild -cflag -g  -use-ocamlfind Main.byte -pkgs str,llvm
+	ocamlbuild -cflag -g -use-ocamlfind Main.byte -pkgs str,llvm
 
 debug:
-	ocamlbuild -cflag -g  -use-ocamlfind Main.byte -pkgs str,llvm -tag debug
+	ocamlbuild -cflag -g -use-ocamlfind Main.byte -pkgs str,llvm -tag debug
 
 Parser.ml Parser.mli: Parser.mly
 	ocamlyacc -v Parser.mly
@@ -23,7 +24,7 @@ distclean: clean
 	rm -rf _build Main.byte
 
 pack: clean
-	tar cvfz gracec.tar.gz $(SRCFILES)
+	tar cvfz compilerEds.tar.gz $(SRCFILES)
 
 count:
 	wc -l $(SRCFILES)
